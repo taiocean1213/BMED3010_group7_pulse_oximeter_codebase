@@ -4,6 +4,11 @@
 
 #include "hardware_driver_apis/HardwareAbstractionLayerInterface.h"
 
+#define PHOTODIODE_PIN A0
+#define RED_SIGNAL_PIN DAC0
+#define INFRARED_SIGNAL_PIN DAC1
+
+
 /**
  * @class PPGSignalHardwareController
  * @brief A class that controls the hardware for PPG signals.
@@ -40,7 +45,7 @@ template <class voltage_data_type, class time_data_type, class pin_id_data_type>
 void PPGSignalHardwareController<voltage_data_type, time_data_type,
                                  pin_id_data_type>::setRedLED(voltage_data_type
                                                                   ledVoltage) {
-  hardwareLayer->writeVoltage(5, ledVoltage);
+  hardwareLayer->writeVoltage(INFRARED_SIGNAL_PIN, ledVoltage);
 }
 
 /**
@@ -51,7 +56,7 @@ template <class voltage_data_type, class time_data_type, class pin_id_data_type>
 void PPGSignalHardwareController<
     voltage_data_type, time_data_type,
     pin_id_data_type>::setInfraRedLED(voltage_data_type ledVoltage) {
-  hardwareLayer->writeVoltage(6, ledVoltage);
+  hardwareLayer->writeVoltage(RED_SIGNAL_PIN, ledVoltage);
 }
 
 /**
@@ -66,5 +71,5 @@ auto PPGSignalHardwareController<voltage_data_type, time_data_type,
     getPhotoDiodeVoltage(time_data_type photoDiodeWarmupTimeMs)
         -> voltage_data_type {
   hardwareLayer->waitMicroseconds(photoDiodeWarmupTimeMs);
-  return hardwareLayer->readVoltage(A0);
+  return hardwareLayer->readVoltage(PHOTODIODE_PIN);
 }
