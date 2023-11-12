@@ -19,6 +19,13 @@ class HardwareAbstractionLayer {
   HardwareAbstractionLayer(int analogResolutionValue, int baudRate);
 
   /**
+   * @brief Gets the current time in microseconds.
+   *
+   * @return The current time in microseconds.
+   */
+  time_data_type getCurrentTimeUs() override;
+  
+  /**
    * @brief Configures a pin t either output or input mode.
    * @param outputPinId The ID of the pin that needs to be configured.
    * @param outputIsTrue The boolean value that set the pin
@@ -54,8 +61,8 @@ class HardwareAbstractionLayer {
   void writeVoltage(pin_id_data_type, voltage_data_type) override;
 
  private:
-  int analogResolutionValue{};
-  int baudRate{};
+  int analogResolutionValue;
+  int baudRate;
   voltage_data_type maxOutputVoltage;
   voltage_data_type minOutputVoltage;
 };

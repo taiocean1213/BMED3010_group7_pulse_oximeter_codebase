@@ -32,6 +32,16 @@ HardwareAbstractionLayer<voltage_data_type, time_data_type, pin_id_data_type>::
 }
 
 /**
+ * @brief Gets the current time in microseconds.
+ * @return The current time in microseconds.
+ */
+template <class voltage_data_type, class time_data_type, class pin_id_data_type>
+time_data_type HardwareAbstractionLayer<voltage_data_type, time_data_type,
+                                        pin_id_data_type>::getCurrentTimeUs() {
+  return micros();
+}
+
+/**
  * @brief Configures a pin t either output or input mode.
  *
  *
@@ -181,11 +191,21 @@ void HardwareAbstractionLayer<
   // Convert the output voltage to the quantized level
   // The formula is derived from the information in
   // https://link.springer.com/chapter/10.1007/978-3-030-88439-0_7
-  auto outputVoltage_double = static_cast<double>(outputVoltage);
+  double outputVoltage_double = static_cast<double>(outputVoltage);
   int quantized_level =
       (int)((outputVoltage_double - this->minOutputVoltage) *
             pow(2.0, (double)(this->analogResolutionValue)) /
             (this->maxOutputVoltage - this->minOutputVoltage));
+
+  if (outputVoltage_double == this->maxOutputVoltage) {
+    digitalWrite(outputPinId, HIGH);
+    return;
+  }
+
+  if (outputVoltage_double == this->minOutputVoltage) {
+    digitalWrite(outputPinId, LOW);
+    return;
+  }
 
   // Output the quantized level to the specified pin
   analogWrite(outputPinId, quantized_level);

@@ -10,6 +10,7 @@
 template <class voltage_data_type, class time_data_type, class pin_id_data_type>
 class HardwareAbstractionLayerInterface {
  public:
+  virtual time_data_type getCurrentTimeUs();
   virtual void setPinMode(pin_id_data_type outputPinId, bool outputIsTrue);
   virtual time_data_type waitUntilTimeUs();
   virtual void setEventAtTimeUs(time_data_type, void*(void)) = 0;
