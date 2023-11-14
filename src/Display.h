@@ -2,36 +2,63 @@
 #define DISPLAY_H
 
 #include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>  // Example library for SSD1306 OLED display
-#include <Arduino.h>
+#include <Adafruit_ILI9341.h>
 
 #include "user_interface/Displayinterface.h"
 
+/**
+ * @class Display
+ * @brief Class for the display functionality
+ * @tparam values_data_type The data type of the value
+ */
 template <class values_data_type>
 class Display : public DisplayInterface<values_data_type> {
  public:
   /**
-   * @brief Sets up the user interface.
+   * @brief Constructor for the Display class
    */
-  void setupUI() override;
+  Display();
 
   /**
-   * @brief Displays the heart rate.
-   * @param heartRate The heart rate to display.
+   * @brief Initialize the display
    */
-  void displayHeartRate(values_data_type heartRate) override;
+  void begin() override;
 
   /**
-   * @brief Displays the SpO2 value.
-   * @param spo2Value The SpO2 value to display.
+   * @brief Update the SpO2 value on the display
+   * @tparam values_data_type The data type of the SpO2 value
+   * @param spo2_value The SpO2 value to be displayed
    */
-  void displaySpO2(values_data_type spo2Value) override;
+  void updateSpO2(values_data_type spo2_value) override;
 
   /**
-   * @brief Displays a PPG data point.
-   * @param ppgDataPoint The PPG data point to display.
+   * @brief Update the heart rate value on the display
+   * @tparam values_data_type The data type of the heart rate value
+   * @param hr_value The heart rate value to be displayed
    */
-  void displayPPGDataPoint(values_data_type ppgDataPoint) override;
+  void updateHBR(values_data_type hr_value) override;
+
+  /**
+   * @brief Update the PPG waveform on the display
+   * @tparam values_data_type The data type of the PPG values
+   * @param ppg_values An array of PPG values
+   * @param num_values The number of PPG values in the array
+   * @param min_ppg_value The minimum PPG value
+   * @param max_ppg_value The maximum PPG value
+   */
+  void updatePPGWave(values_data_type ppg_values[], int num_values,
+                     values_data_type min_ppg_value,
+                     values_data_type max_ppg_value) override;
+
+  /**
+   * @brief Clear the display screen
+   */
+  void clearScreen() override;
+
+ private:
+  Adafruit_ILI9341 TFTscreen;
 };
+
+// TODO explicit instantiation needed
 
 #endif
