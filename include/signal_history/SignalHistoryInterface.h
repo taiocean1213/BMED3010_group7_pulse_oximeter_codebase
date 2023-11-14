@@ -12,11 +12,11 @@ template <class element_type>
 class SignalHistoryInterface {
  public:
   virtual void put(element_type signal) = 0;
-  virtual element_type get(size_t nthSample) = 0;
+  virtual element_type get(element_type nthSample) = 0;
   virtual void reset() = 0;
 
  private:
-  virtual size_t getEntryPointIndex() = 0;
+  virtual element_type getEntryPointIndex() = 0;
   virtual void updateEntryPointIndex() = 0;
 };
 

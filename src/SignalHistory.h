@@ -15,9 +15,13 @@
  * @tparam element_type The type of signal to be stored in the history, such as
  * pulse or oxygen saturation.
  */
-template <class element_type>
+template <class element_type, element_type ARRAYSIZE>
 class SignalHistory : public SignalHistoryInterface<element_type> {
  public:
+  /**
+   * @brief Default constructor for SignalHistory.
+   */
+  SignalHistory();
   /**
    * @brief Puts a signal into the history.
    *
@@ -33,7 +37,7 @@ class SignalHistory : public SignalHistoryInterface<element_type> {
    * @return The signal at the given index.
    * This could be a pulse or oxygen saturation signal.
    */
-  element_type get(size_t nthSample) override;
+  element_type get(element_type nthSample) override;
 
   /**
    * @brief Resets the history.
@@ -50,7 +54,7 @@ class SignalHistory : public SignalHistoryInterface<element_type> {
    * This could be the index where the next signal will be stored in the
    * history.
    */
-  size_t getEntryPointIndex() override;
+  element_type getEntryPointIndex() override;
 
   /**
    * @brief Updates the entry point index.
@@ -60,6 +64,6 @@ class SignalHistory : public SignalHistoryInterface<element_type> {
   void updateEntryPointIndex() override;
 };
 
-// #include "ConcreteSignalHistory.tpp"
+// Explicit instantiation is needed
 
 #endif
