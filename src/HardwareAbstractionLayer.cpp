@@ -16,9 +16,13 @@
  */
 template <class voltage_data_type, class time_data_type, class pin_id_data_type>
 HardwareAbstractionLayer<voltage_data_type, time_data_type, pin_id_data_type>::
-    HardwareAbstractionLayer(int analogResolutionValue, int baudRate) {
+    HardwareAbstractionLayer(int analogResolutionValue, int baudRate,
+                             voltage_data_type minOutputVoltage,
+                             voltage_data_type maxOutputVoltage) {
   this->analogResolutionValue = analogResolutionValue;
   this->baudRate = baudRate;
+  this->minOutputVoltage = minOutputVoltage;
+  this->maxOutputVoltage = maxOutputVoltage;
 
   // Begin serial communication at `baudRate` baud rate for debugging purposes.
   if (baudRate != 0) {

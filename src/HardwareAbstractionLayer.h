@@ -16,7 +16,9 @@ class HardwareAbstractionLayer {
    * @param baudRate The baud rate that is set for communication via
    * the serial port.
    */
-  HardwareAbstractionLayer(int analogResolutionValue, int baudRate);
+  HardwareAbstractionLayer(int analogResolutionValue, int baudRate,
+                           voltage_data_type minOutputVoltage,
+                           voltage_data_type maxOutputVoltage);
 
   /**
    * @brief Gets the current time in microseconds.
@@ -24,7 +26,7 @@ class HardwareAbstractionLayer {
    * @return The current time in microseconds.
    */
   time_data_type getCurrentTimeUs() override;
-  
+
   /**
    * @brief Configures a pin t either output or input mode.
    * @param outputPinId The ID of the pin that needs to be configured.
@@ -66,5 +68,7 @@ class HardwareAbstractionLayer {
   voltage_data_type maxOutputVoltage;
   voltage_data_type minOutputVoltage;
 };
+
+// FIXME need explicit instantiation
 
 #endif
