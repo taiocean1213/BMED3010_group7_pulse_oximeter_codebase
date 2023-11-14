@@ -8,7 +8,6 @@
         "utility": "cpp"
     },
     "cmake.configureOnOpen": true,
-    
-
-    "C_Cpp.clang_format_fallbackStyle": "Google"
+    "C_Cpp.clang_format_fallbackStyle": "Google",
+    "editor.formatOnSave": true
 }
