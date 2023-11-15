@@ -5,7 +5,8 @@
         "*.tcc": "cpp",
         "istream": "cpp",
         "tuple": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "complex": "cpp"
     },
     "cmake.configureOnOpen": true,
     "C_Cpp.clang_format_fallbackStyle": "Google",
