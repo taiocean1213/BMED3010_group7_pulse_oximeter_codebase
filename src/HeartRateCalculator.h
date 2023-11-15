@@ -4,23 +4,24 @@
 #include "biomedical_metrics/HeartRateCalculatorInterface.h"
 
 /**
- * @interface HeartRateCalculator
- * @brief Abstract base class for calculating heart rate values.
+ * @class HeartRateCalculator
+ * @brief This class implements the heart rate calculation logic.
+ *
+ * This class provides the implementation for the heart rate calculation logic.
+ * It inherits from the CalculationModuleInterface class and overrides the
+ * calculate function.
+ *
+ * @tparam element_type The type of the elements in the data vector.
  */
 template <class element_type>
 class HeartRateCalculator : public HeartRateCalculatorInterface<element_type> {
  public:
   /**
    * @brief Calculates the heart rate.
+   * @param data A vector of integers representing the heart rate data.
    * @return The calculated heart rate.
    */
-  double calculateHeartRate() override;
-
-  /**
-   * @brief Processes the heart rate data.
-   * @param data The heart rate data.
-   */
-  void processHeartRateData(element_type data) override;
+  element_type calculate(std::vector<element_type>& data) override;
 };
 
 #endif

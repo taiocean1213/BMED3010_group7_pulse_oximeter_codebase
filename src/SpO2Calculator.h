@@ -1,30 +1,27 @@
 #ifndef SPO2CALCULATOR_H
 #define SPO2CALCULATOR_H
 
-#include <Arduino.h>
-
-#include "signal_history/SignalHistoryInterface.h"
-#undef min  // for muting the `Arduino.h` in-built min() function
-#undef max  // for muting the `Arduino.h` in-built max() function
+#include "biomedical_metrics/SpO2CalculatorInterface.h"
 
 /**
- * @interface SpO2Calculator
- * @brief Abstract base class for calculating SpO2 values.
+ * @class SpO2Calculator
+ * @brief This class implements the SpO2 calculation logic.
+ *
+ * This class provides the implementation for the SpO2 calculation logic.
+ * It inherits from the CalculationModuleInterface class and overrides the
+ * calculate function.
+ *
+ * @tparam element_type The type of the elements in the data vector.
  */
 template <class element_type>
-class SpO2Calculator : public SignalHistoryInterface<element_type> {
+class SpO2Calculator : public SpO2CalculatorInterface<element_type> {
  public:
   /**
-   * @brief Calculates the SpO2 value.
-   * @return The calculated SpO2 value.
+   * @brief Calculates the SpO2.
+   * @param data A vector of floats representing the SpO2 data.
+   * @return The calculated SpO2.
    */
-  double calculateSpO2() override;
-
-  /**
-   * @brief Processes the SpO2 data.
-   * @param data The SpO2 data.
-   */
-  void processSpO2Data(element_type data) override;
+  element_type calculate(std::vector<element_type>& data) override;
 };
 
 #endif

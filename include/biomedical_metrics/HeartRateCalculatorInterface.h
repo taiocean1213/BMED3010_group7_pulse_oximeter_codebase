@@ -4,13 +4,15 @@
  * @brief Abstract base class for calculating heart rate values.
  */
 
-#ifndef BIOMEDICAL_METRICS_HEARTRATECALCULATORINTERFACE_H
-#define BIOMEDICAL_METRICS_HEARTRATECALCULATORINTERFACE_H
+#ifndef HEARTRATECALCULATORINTERFACE_H
+#define HEARTRATECALCULATORINTERFACE_H
 
-#include "../signal_history/SignalHistoryInterface.h"
+#include <vector>
+
+#include "CalculationModuleInterface.h"
 
 template <class element_type>
 class HeartRateCalculatorInterface
-    : public SignalHistoryInterface<element_type> {};
+    : public CalculationModuleInterface<element_type> {};
 
 #endif
