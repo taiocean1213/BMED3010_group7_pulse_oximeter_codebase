@@ -25,7 +25,8 @@ class FastFourierTransform
    * @return The result of the Fast Fourier Transform operation.
    */
   std::vector<element_datatype> fastFourierTransform(
-      const element_datatype* realInput, const element_datatype* imaginaryInput,
+      const std::vector<element_datatype> realInput,
+      const std::vector<element_datatype> imaginaryInput,
       element_datatype sampleSize) override;
 
   /**
@@ -35,7 +36,8 @@ class FastFourierTransform
    * @return The result of the Inverse Fast Fourier Transform operation.
    */
   std::vector<element_datatype> inverseFastFourierTransform(
-      const element_datatype* realInput, const element_datatype* imaginaryInput,
+      const std::vector<element_datatype> realInput,
+      const std::vector<element_datatype> imaginaryInput,
       element_datatype sampleSize) override;
 
  private:

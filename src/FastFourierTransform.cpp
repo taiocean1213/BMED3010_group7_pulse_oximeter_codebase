@@ -41,7 +41,8 @@ void FastFourierTransform<element_datatype>::fft(std::vector<cd>& a,
 template <typename element_datatype>
 std::vector<element_datatype>
 FastFourierTransform<element_datatype>::fastFourierTransform(
-    const element_datatype* realInput, const element_datatype* imaginaryInput,
+    const std::vector<element_datatype> realInput,
+    const std::vector<element_datatype> imaginaryInput,
     element_datatype sampleSize) {
   std::vector<cd> input(sampleSize);
   for (int i = 0; i < sampleSize; i++) {
@@ -59,7 +60,8 @@ FastFourierTransform<element_datatype>::fastFourierTransform(
 template <typename element_datatype>
 std::vector<element_datatype>
 FastFourierTransform<element_datatype>::inverseFastFourierTransform(
-    const element_datatype* realInput, const element_datatype* imaginaryInput,
+    const std::vector<element_datatype> realInput,
+    const std::vector<element_datatype> imaginaryInput,
     element_datatype sampleSize) {
   std::vector<cd> input(sampleSize);
   for (int i = 0; i < sampleSize; i++) {
