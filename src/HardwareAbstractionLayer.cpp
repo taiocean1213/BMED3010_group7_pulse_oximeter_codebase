@@ -2,6 +2,8 @@
 #include "HardwareAbstractionLayer.h"
 
 #include <Arduino.h>
+#undef min //for muting the `Arduino.h` in-built min() function
+#undef max //for muting the `Arduino.h` in-built max() function
 
 /**
  * @brief Constructors that configures the hardware input and output

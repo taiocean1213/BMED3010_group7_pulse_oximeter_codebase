@@ -1,13 +1,14 @@
 #include "PPGSignalHardwareController.h"
 
 #include <Arduino.h>
+#undef min //for muting the `Arduino.h` in-built min() function
+#undef max //for muting the `Arduino.h` in-built max() function
 
 #include "hardware_driver_apis/HardwareAbstractionLayerInterface.h"
 
 #define PHOTODIODE_PIN A0
 #define RED_SIGNAL_PIN DAC0
 #define INFRARED_SIGNAL_PIN DAC1
-
 
 /**
  * @class PPGSignalHardwareController

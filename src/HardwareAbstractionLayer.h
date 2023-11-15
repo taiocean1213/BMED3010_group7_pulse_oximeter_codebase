@@ -2,6 +2,8 @@
 #define HARDWAREABSTRACTIONLAYER_H
 
 #include <Arduino.h>
+#undef min //for muting the `Arduino.h` in-built min() function
+#undef max //for muting the `Arduino.h` in-built max() function
 
 #include "hardware_driver_apis/HardwareAbstractionLayerInterface.h"
 

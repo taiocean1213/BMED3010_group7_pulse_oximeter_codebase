@@ -1,4 +1,6 @@
 #include <Arduino.h>
+#undef min //for muting the `Arduino.h` in-built min() function
+#undef max //for muting the `Arduino.h` in-built max() function
 
 #include "Display.h"
 #include "HardwareAbstractionLayer.h"

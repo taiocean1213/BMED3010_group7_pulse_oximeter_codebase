@@ -1,8 +1,11 @@
 #ifndef SPO2CALCULATOR_H
 #define SPO2CALCULATOR_H
 
-#include "signal_history/SignalHistoryInterface.h"
 #include <Arduino.h>
+
+#include "signal_history/SignalHistoryInterface.h"
+#undef min  // for muting the `Arduino.h` in-built min() function
+#undef max  // for muting the `Arduino.h` in-built max() function
 
 /**
  * @interface SpO2Calculator
@@ -10,7 +13,7 @@
  */
 template <class element_type>
 class SpO2Calculator : public SignalHistoryInterface<element_type> {
-public:
+ public:
   /**
    * @brief Calculates the SpO2 value.
    * @return The calculated SpO2 value.
