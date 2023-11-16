@@ -1,7 +1,8 @@
 #ifndef EVENTCONTROLLER_H
 #define EVENTCONTROLLER_H
 
-#include "EventController.h"
+#include <map>
+
 #include "biomedical_metrics/HeartRateCalculatorInterface.h"
 #include "biomedical_metrics/SpO2CalculatorInterface.h"
 #include "event_controller/EventControllerInterface.h"
@@ -11,7 +12,6 @@
 #include "signal_filter/FilterInterface.h"
 #include "signal_history/SignalHistoryInterface.h"
 #include "user_interface/Displayinterface.h"
-
 /**
  * @brief EventController class template for handling events.
  *
@@ -25,12 +25,6 @@ template <class voltage_data_type, class time_data_type, class pin_id_data_type>
 class EventController : public EventControllerInterface {
  public:
   /**
-   * @brief Setup method for initializing the HardwareAbstractionLayer,
-   * PPGSignalHardwareController, Display, and SignalHistory classes.
-   */
-  void setup() override;
-
-  /**
    * @brief LoopOnce method for implementing the logic for the main loop of the
    * event controller.
    */
@@ -43,18 +37,52 @@ class EventController : public EventControllerInterface {
   ~EventController();
 
  private:
-  HardwareAbstractionLayerInterface<voltage_data_type, time_data_type,
-                                    pin_id_data_type>* hardwareLayerInstancePtr;
-  PPGSignalHardwareControllerInterface<voltage_data_type, time_data_type,
-                                       pin_id_data_type>*
-      ppgSignalControllerInstancePtr;
-  DisplayInterface<voltage_data_type>* displayInstancePtr;
-  SignalHistoryInterface<voltage_data_type>* signalHistoryInstancePtr;
-  FastFourierTransformInterface<voltage_data_type>* fftInstancePtr;
-  FilterInterface<voltage_data_type, voltage_data_type>* filterInstancePtr;
-  SpO2CalculatorInterface<voltage_data_type>* spO2CalculatorInstancePtr;
-  HeartRateCalculatorInterface<voltage_data_type>*
-      heartRateCalculatorInstancePtr;
+  typedef struct HelperClassInstances {
+    HardwareAbstractionLayerInterface<voltage_data_type, time_data_type,
+                                      pin_id_data_type>* hardwareLayerPtr;
+    PPGSignalHardwareControllerInterface<voltage_data_type, time_data_type,
+                                         pin_id_data_type>*
+        ppgSignalControllerPtr;
+    DisplayInterface<voltage_data_type>* displayPtr;
+    SignalHistoryInterface<voltage_data_type>* signalHistoryPtr;
+    FastFourierTransformInterface<voltage_data_type>* fftPtr;
+    FilterInterface<voltage_data_type, voltage_data_type>* filterPtr;
+    SpO2CalculatorInterface<voltage_data_type>* spO2CalculatorPtr;
+    HeartRateCalculatorInterface<voltage_data_type>* heartRateCalculatorPtr;
+  } helper_class_instance_data_type;
+
+  typedef enum {
+    RedLedOn,
+    InfraRedLedOn,
+    PhotoDetectorReading,
+    UiIsUpdating,
+    SignalIsProcessing,
+    DeviceIdling,
+    GettingEventSequenceStartTime,
+    GettingEventSequenceEndTime
+  } DeviceState;
+
+  typedef struct DeviceStatus {
+    voltage_data_type redLedVoltage;
+    voltage_data_type infraRedLedVoltage;
+    voltage_data_type rawPhotodiodeVoltage;
+    time_data_type eventSequenceStartTime;
+    time_data_type eventSequenceEndTime;
+    DeviceState deviceState;
+  } device_status_data_type;
+
+  typedef struct DeviceMemory {
+    voltage_data_type redLedVoltage;
+    voltage_data_type infraRedLedVoltage;
+    voltage_data_type rawPhotodiodeVoltage;
+    time_data_type eventSequenceStartTime;
+    time_data_type eventSequenceEndTime;
+    DeviceState deviceState;
+  } device_memory_data_type;
+
+  helper_class_instance_data_type helperClassInstance;
+  device_status_data_type deviceMemory;
+  device_status_data_type deviceStatus;
 };
 
 // TODO explicit instantiation required
