@@ -32,7 +32,7 @@ class Filter : public FilterInterface<element_data_type, frequency_datatype> {
       std::vector<std::pair<element_data_type, element_data_type>>& passbands,
       std::vector<std::pair<element_data_type, element_data_type>>& stopbands,
       element_data_type samplingFrequency,
-      FastFourierTransformInterface<element_data_type>& fft);
+      FastFourierTransformInterface<element_data_type>* fftClassInstance);
 
   /**
    * @brief Apply the filter to the given data.
@@ -43,12 +43,14 @@ class Filter : public FilterInterface<element_data_type, frequency_datatype> {
    * @param filterInput A vector that needs to be filtered.
    * @return The filtered output data.
    */
-  std::vector<element_data_type> filter(
+  std::vector<element_data_type> process(
       std::vector<element_data_type> filterInput) override;
 
  private:
-  FastFourierTransformInterface<element_data_type>&
-      fft_;  //!< The FastFourierTransformInterface instance.
+  FastFourierTransformInterface<element_data_type>*
+      fftClassInstance;  //!< The FastFourierTransformInterface instance.
 };
+
+template class Filter<double, double>;
 
 #endif

@@ -2,8 +2,11 @@
 #include "HardwareAbstractionLayer.h"
 
 #include <Arduino.h>
-#undef min //for muting the `Arduino.h` in-built min() function
-#undef max //for muting the `Arduino.h` in-built max() function
+#undef Min
+#undef Max
+#undef abs
+#undef min  // for muting the `Arduino.h` in-built min() function
+#undef max  // for muting the `Arduino.h` in-built max() function
 
 /**
  * @brief Constructors that configures the hardware input and output
@@ -35,7 +38,7 @@ HardwareAbstractionLayer<voltage_data_type, time_data_type, pin_id_data_type>::
   // (`2 ^ analogResolutionValue` levels).
   analogWriteResolution(analogResolutionValue);
   analogReadResolution(analogResolutionValue);
-}
+};
 
 /**
  * @brief Gets the current time in microseconds.
@@ -45,7 +48,7 @@ template <class voltage_data_type, class time_data_type, class pin_id_data_type>
 time_data_type HardwareAbstractionLayer<voltage_data_type, time_data_type,
                                         pin_id_data_type>::getCurrentTimeUs() {
   return micros();
-}
+};
 
 /**
  * @brief Configures a pin t either output or input mode.
@@ -66,7 +69,7 @@ void HardwareAbstractionLayer<voltage_data_type, time_data_type,
   // if outputIsTrue == true, the set pin with outputPinId
   // as OUTPUT, else set it to input
   pinMode(outputPinId, outputIsTrue ? OUTPUT : INPUT);
-}
+};
 
 /**
  * @brief Waits until a specified time in microseconds.
@@ -79,9 +82,9 @@ void HardwareAbstractionLayer<voltage_data_type, time_data_type,
  * @param timeUs The time in microseconds to wait.
  */
 template <class voltage_data_type, class time_data_type, class pin_id_data_type>
-void HardwareAbstractionLayer<voltage_data_type, time_data_type,
-                              pin_id_data_type>::waitUntilTimeUs(time_data_type
-                                                                     timeUs) {
+time_data_type HardwareAbstractionLayer<
+    voltage_data_type, time_data_type,
+    pin_id_data_type>::waitUntilTimeUs(time_data_type timeUs) {
   /**
    * @brief Gets the current time in microseconds and stores it in startTime.
    */
@@ -95,7 +98,7 @@ void HardwareAbstractionLayer<voltage_data_type, time_data_type,
   while ((micros() - startTime) < timeUs) {
     // Do nothing, just wait.
   }
-}
+};
 
 // /**
 //  * @brief Waits until a specified time in microseconds.
@@ -142,7 +145,7 @@ void HardwareAbstractionLayer<voltage_data_type, time_data_type,
    * @brief Delay for timeUs based on the parameter.
    */
   delayMicroseconds(timeUs);
-}
+};
 
 /**
  * @brief Reads the voltage from the specified pin
@@ -175,7 +178,7 @@ auto HardwareAbstractionLayer<voltage_data_type, time_data_type,
 
   // Return the voltage
   return voltage;
-}
+};
 
 /**
  * @brief Writes the voltage to the specified pin
@@ -215,4 +218,4 @@ void HardwareAbstractionLayer<
 
   // Output the quantized level to the specified pin
   analogWrite(outputPinId, quantized_level);
-}
+};

@@ -1,6 +1,7 @@
 #ifndef SIGNAL_HISTORY_H
 #define SIGNAL_HISTORY_H
 
+#include <deque>
 #include <vector>
 
 #include "signal_history/SignalHistoryInterface.h"
@@ -11,7 +12,7 @@
  * @tparam element_type The type of the signals.
  * @tparam ARRAYSIZE The maximum size of the history.
  */
-template <class element_type, element_type ARRAYSIZE>
+template <class element_type>
 class SignalHistory : public SignalHistoryInterface<element_type> {
  public:
   /**
@@ -19,7 +20,14 @@ class SignalHistory : public SignalHistoryInterface<element_type> {
    *
    * This constructor initializes an empty vector with a capacity of ARRAYSIZE.
    */
-  SignalHistory();
+  SignalHistory(element_type arraySize);
+
+  /**
+   * @brief Destructs a new SignalHistory object.
+   *
+   * This Destructor deletes vector attributes of the class instance.
+   */
+  ~SignalHistory();
 
   /**
    * @brief Adds a signal to the history.
@@ -68,7 +76,10 @@ class SignalHistory : public SignalHistoryInterface<element_type> {
    */
   void updateEntryPointIndex() override;
 
-  std::vector<element_type> history;  // The history of signals
+ private:
+  std::deque<element_type> history;  // The history of signals
 };
 
-#endif  // SIGNAL_HISTORY_H
+template class SignalHistory<double>;
+
+#endif

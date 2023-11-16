@@ -2,12 +2,16 @@
 #define DISPLAY_H
 
 #include <Adafruit_GFX.h>
+#undef min
+#undef max
+#undef Min
+#undef Max
+#undef abs
 #include <Adafruit_ILI9341.h>
 
 #include "user_interface/Displayinterface.h"
 
 /**
- * @class Display
  * @brief Class for the display functionality
  * @tparam values_data_type The data type of the value
  */
@@ -60,5 +64,8 @@ class Display : public DisplayInterface<values_data_type> {
 };
 
 // TODO explicit instantiation needed
+template class Display<int>;
+template class Display<float>;
+template class Display<double>;
 
 #endif

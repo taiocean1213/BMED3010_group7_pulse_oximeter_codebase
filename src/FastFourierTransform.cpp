@@ -35,8 +35,7 @@ void FastFourierTransform<element_datatype>::fft(std::vector<cd>& a,
   if (invert) {
     for (cd& x : a) x /= n;
   }
-}
-
+};
 // https://cp-algorithms.com/algebra/fft.html#improved-implementation-in-place-computation
 template <typename element_datatype>
 std::vector<element_datatype>
@@ -54,8 +53,7 @@ FastFourierTransform<element_datatype>::fastFourierTransform(
     result[i] = input[i].real();
   }
   return result;
-}
-
+};
 // https://cp-algorithms.com/algebra/fft.html#improved-implementation-in-place-computation
 template <typename element_datatype>
 std::vector<element_datatype>
@@ -73,4 +71,4 @@ FastFourierTransform<element_datatype>::inverseFastFourierTransform(
     result[i] = input[i].real() / sampleSize;
   }
   return result;
-}
+};

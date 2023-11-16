@@ -2,6 +2,11 @@
 
 // Include the Adafruit GFX library for drawing graphics
 #include <Adafruit_GFX.h>
+#undef min
+#undef max
+#undef Min
+#undef Max
+#undef abs
 // Include the Adafruit ILI9341 library for interacting with the ILI9341 TFT
 // display
 #include <Adafruit_ILI9341.h>
@@ -31,8 +36,7 @@ void Display<values_data_type>::begin() {
   TFTscreen.setRotation(3);
   // Fill the screen with black color
   TFTscreen.fillScreen(ILI9341_BLACK);
-}
-
+};
 /**
  * @brief Update the SpO2 value on the display
  * @tparam values_data_type The data type of the SpO2 value
@@ -50,8 +54,7 @@ void Display<values_data_type>::updateSpO2(values_data_type spo2_value) {
   TFTscreen.print("SpO2: ");
   // Print the SpO2 value
   TFTscreen.print(spo2_value);
-}
-
+};
 /**
  * @brief Update the heart beat rate value on the display
  * @tparam values_data_type The data type of the heart rate value
@@ -71,8 +74,7 @@ void Display<values_data_type>::updateHBR(values_data_type hr_value) {
   TFTscreen.print("HR: ");
   // Print the heart rate value
   TFTscreen.print(hr_value);
-}
-
+};
 /**
  * @brief Update the PPG waveform on the display
  * @tparam values_data_type The data type of the PPG values
@@ -110,8 +112,7 @@ void Display<values_data_type>::updatePPGWave(values_data_type ppg_values[],
     // Draw the bar on the screen
     TFTscreen.fillRect(i * bar_width, bar_y, bar_width, bar_height, BAR_COLOR);
   }
-}
-
+};
 /**
  * @brief Clear the display screen
  */

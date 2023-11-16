@@ -1,8 +1,11 @@
 #include "PPGSignalHardwareController.h"
 
 #include <Arduino.h>
-#undef min //for muting the `Arduino.h` in-built min() function
-#undef max //for muting the `Arduino.h` in-built max() function
+#undef Min
+#undef Max
+#undef abs
+#undef min  // for muting the `Arduino.h` in-built min() function
+#undef max  // for muting the `Arduino.h` in-built max() function
 
 #include "hardware_driver_apis/HardwareAbstractionLayerInterface.h"
 
@@ -36,8 +39,7 @@ auto PPGSignalHardwareController<voltage_data_type, time_data_type,
                                  pin_id_data_type>::getCurrentTimeUs()
     -> time_data_type {
   return hardwareLayer->getCurrentTimeUs();
-}
-
+};
 /**
  * @brief Sets the voltage of the red LED.
  * @param ledVoltage The voltage to set for the red LED.

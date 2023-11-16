@@ -2,13 +2,18 @@
 #define HARDWAREABSTRACTIONLAYER_H
 
 #include <Arduino.h>
-#undef min //for muting the `Arduino.h` in-built min() function
-#undef max //for muting the `Arduino.h` in-built max() function
+#undef Min
+#undef Max
+#undef abs
 
 #include "hardware_driver_apis/HardwareAbstractionLayerInterface.h"
+#undef min  // for muting the `Arduino.h` in-built min() function
+#undef max  // for muting the `Arduino.h` in-built max() function
 
 template <class voltage_data_type, class time_data_type, class pin_id_data_type>
-class HardwareAbstractionLayer {
+class HardwareAbstractionLayer
+    : public HardwareAbstractionLayerInterface<
+          voltage_data_type, time_data_type, pin_id_data_type> {
  public:
   /**
    * @brief Constructors that configures the hardware input and output
@@ -41,7 +46,7 @@ class HardwareAbstractionLayer {
    * @brief Waits until a specified time in microseconds.
    * @param timeUs The time in microseconds until to return.
    */
-  void waitUntilTimeUs(time_data_type) override;
+  time_data_type waitUntilTimeUs(time_data_type) override;
 
   // TODO(taiocean1213):
   // void setEventAtTimeUs(time_data_type, void*(void)) override;
@@ -71,6 +76,7 @@ class HardwareAbstractionLayer {
   voltage_data_type minOutputVoltage;
 };
 
-// FIXME need explicit instantiation
+// need explicit instantiation
+template class HardwareAbstractionLayer<double, int, int>;
 
 #endif

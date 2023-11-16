@@ -20,4 +20,4 @@ element_type SpO2Calculator<element_type>::calculate(
     sum += value;
   }
   return sum / data.size();
-}
+};

@@ -22,7 +22,7 @@ class FilterInterface {
    * @param filterInput The input data to be filtered.
    * @return The filtered output data.
    */
-  virtual std::vector<element_data_type> filter(
+  virtual std::vector<element_data_type> process(
       std::vector<element_data_type> filterInput) = 0;
 };
 

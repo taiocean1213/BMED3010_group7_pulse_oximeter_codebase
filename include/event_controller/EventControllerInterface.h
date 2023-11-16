@@ -5,7 +5,6 @@
 
 #ifndef EVENTCONTROLLERINTERFACE_H
 #define EVENTCONTROLLERINTERFACE_H
-template <class signal_data_type>
 class EventControllerInterface {
  public:
   virtual void setup() = 0;

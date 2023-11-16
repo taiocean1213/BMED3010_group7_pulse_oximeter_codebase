@@ -20,4 +20,4 @@ element_type HeartRateCalculator<element_type>::calculate(
     sum += value;
   }
   return sum;
-}
+};

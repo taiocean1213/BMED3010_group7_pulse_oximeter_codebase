@@ -72,6 +72,7 @@ class PPGSignalHardwareController
 };
 
 // Explicit instantiation
-template class PPGSignalHardwareController<int, unsigned long, int>;
+template class PPGSignalHardwareController<double, int, int>;
+;
 
 #endif /* PPGSIGNALHARDWARECONTROLLER_H */
