@@ -37,7 +37,7 @@ class EventController : public EventControllerInterface {
   ~EventController();
 
  private:
-  typedef struct HelperClassInstances {
+  typedef struct HelperClassInstanceStruct {
     HardwareAbstractionLayerInterface<voltage_data_type, time_data_type,
                                       pin_id_data_type>* hardwareLayerPtr;
     PPGSignalHardwareControllerInterface<voltage_data_type, time_data_type,
@@ -62,12 +62,23 @@ class EventController : public EventControllerInterface {
     GettingEventSequenceEndTime
   } DeviceState;
 
+  typedef struct DeviceSettings {
+    int analogResolutionValue;
+    int baudRate;
+    voltage_data_type minOutputVoltage;
+    voltage_data_type maxOutputVoltage;
+    std::vector<std::pair<voltage_data_type, voltage_data_type>> passbandsHz;
+    std::vector<std::pair<voltage_data_type, voltage_data_type>> stopbandsHz;
+    voltage_data_type samplingFrequencyHz;
+    voltage_data_type signalHistoryElementsCount;
+  } device_settings_data_type;
+
   typedef struct DeviceStatus {
     voltage_data_type redLedVoltage;
     voltage_data_type infraRedLedVoltage;
     voltage_data_type rawPhotodiodeVoltage;
-    time_data_type eventSequenceStartTime;
-    time_data_type eventSequenceEndTime;
+    time_data_type eventSequenceStartTimeUs;
+    time_data_type eventSequenceEndTimeUs;
     DeviceState deviceState;
   } device_status_data_type;
 
@@ -75,12 +86,13 @@ class EventController : public EventControllerInterface {
     voltage_data_type redLedVoltage;
     voltage_data_type infraRedLedVoltage;
     voltage_data_type rawPhotodiodeVoltage;
-    time_data_type eventSequenceStartTime;
-    time_data_type eventSequenceEndTime;
+    time_data_type eventSequenceStartTimeUs;
+    time_data_type eventSequenceEndTimeUs;
     DeviceState deviceState;
   } device_memory_data_type;
 
   helper_class_instance_data_type helperClassInstance;
+  device_settings_data_type deviceSettings;
   device_status_data_type deviceMemory;
   device_status_data_type deviceStatus;
 };

@@ -23,22 +23,24 @@ template <class voltage_data_type, class time_data_type, class pin_id_data_type>
 EventController<voltage_data_type, time_data_type,
                 pin_id_data_type>::EventController() {
   // initialize the variables containing the device settings
-  int analogResolutionValue = 12;
-  int baudRate = 38400;
-  voltage_data_type minOutputVoltage = 0;
-  voltage_data_type maxOutputVoltage = 3.3;
-  std::vector<std::pair<voltage_data_type, voltage_data_type>> passbands = {
-      {1, 2}, {3, 4}};
-  std::vector<std::pair<voltage_data_type, voltage_data_type>> stopbands = {
-      {5, 6}, {7, 8}};
-  voltage_data_type samplingFrequency = 40;
-  voltage_data_type signalHistoryContainerElemenmts = 50;
+  this->deviceSettings = {
+      12,                // analogResolutionValue
+      38400,             // baudRate
+      0,                 // minOutputVoltage
+      3.3,               // maxOutputVoltage
+      {{1, 2}, {3, 4}},  // passbandsHz
+      {{5, 6}, {7, 8}},  // stopbandsHz
+      40,                // samplingFrequencyHz
+      50                 // signalHistoryElementsCount
+  };
 
   // Initialize the objects using new keyword
   this->helperClassInstance = {
       .hardwareLayerPtr = new HardwareAbstractionLayer<
           voltage_data_type, time_data_type, pin_id_data_type>(
-          analogResolutionValue, baudRate, minOutputVoltage, maxOutputVoltage),
+          this->deviceSettings.analogResolutionValue,
+          this->deviceSettings.baudRate, this->deviceSettings.minOutputVoltage,
+          this->deviceSettings.maxOutputVoltage),
 
       .ppgSignalControllerPtr =
           new PPGSignalHardwareController<voltage_data_type, time_data_type,
@@ -47,13 +49,14 @@ EventController<voltage_data_type, time_data_type,
 
       .displayPtr = new Display<voltage_data_type>(),
 
-      .signalHistoryPtr =
-          new SignalHistory<voltage_data_type>(signalHistoryContainerElemenmts),
+      .signalHistoryPtr = new SignalHistory<voltage_data_type>(
+          this->deviceSettings.signalHistoryElementsCount),
 
       .fftPtr = new FastFourierTransform<voltage_data_type>(),
 
       .filterPtr = new Filter<voltage_data_type, voltage_data_type>(
-          passbands, stopbands, samplingFrequency,
+          this->deviceSettings.passbandsHz, this->deviceSettings.stopbandsHz,
+          this->deviceSettings.samplingFrequencyHz,
           this->helperClassInstance.fftPtr),
 
       .spO2CalculatorPtr = new SpO2Calculator<voltage_data_type>(),
@@ -66,12 +69,12 @@ EventController<voltage_data_type, time_data_type,
   this->helperClassInstance.signalHistoryPtr->reset();
 
   // Set up the deviceStatus of class
-  deviceStatus = {.redLedVoltage = 0,
-                  .infraRedLedVoltage = 0,
-                  .rawPhotodiodeVoltage = 0,
-                  .eventSequenceStartTime = 0,
-                  .eventSequenceEndTime = 0,
-                  .deviceState = RedLedOn};
+  this->deviceStatus = {.redLedVoltage = 0,
+                        .infraRedLedVoltage = 0,
+                        .rawPhotodiodeVoltage = 0,
+                        .eventSequenceStartTimeUs = 0,
+                        .eventSequenceEndTimeUs = 0,
+                        .deviceState = RedLedOn};
 };
 
 /**
@@ -106,38 +109,86 @@ void EventController<voltage_data_type, time_data_type,
   // Check for the state of the program
   DeviceState currentState = deviceStatusStructPtr->deviceState;
 
-  // Branch off to check for the corresponding action to take
+  // Branch off to check for creating flags for the corresponding action to take
   switch (currentState) {
     case RedLedOn:
       // Code to execute when RedLedOn
+      // FIXME Boilerplate code at line below:
+      this->deviceStatus = {.redLedVoltage = 0,
+                            .infraRedLedVoltage = 0,
+                            .rawPhotodiodeVoltage = 0,
+                            .eventSequenceStartTimeUs = 0,
+                            .eventSequenceEndTimeUs = 0,
+                            .deviceState = RedLedOn};
       break;
     case InfraRedLedOn:
       // Code to execute when InfraRedLedOn
+      // FIXME Boilerplate code at line below:
+      this->deviceStatus = {.redLedVoltage = 0,
+                            .infraRedLedVoltage = 0,
+                            .rawPhotodiodeVoltage = 0,
+                            .eventSequenceStartTimeUs = 0,
+                            .eventSequenceEndTimeUs = 0,
+                            .deviceState = RedLedOn};
       break;
     case PhotoDetectorReading:
       // Code to execute when PhotoDetectorReading
+      // FIXME Boilerplate code at line below:
+      this->deviceStatus = {.redLedVoltage = 0,
+                            .infraRedLedVoltage = 0,
+                            .rawPhotodiodeVoltage = 0,
+                            .eventSequenceStartTimeUs = 0,
+                            .eventSequenceEndTimeUs = 0,
+                            .deviceState = RedLedOn};
       break;
     case UiIsUpdating:
       // Code to execute when UiIsUpdating
+      // FIXME Boilerplate code at line below:
+      this->deviceStatus = {.redLedVoltage = 0,
+                            .infraRedLedVoltage = 0,
+                            .rawPhotodiodeVoltage = 0,
+                            .eventSequenceStartTimeUs = 0,
+                            .eventSequenceEndTimeUs = 0,
+                            .deviceState = RedLedOn};
       break;
     case SignalIsProcessing:
       // Code to execute when SignalIsProcessing
+      // FIXME Boilerplate code at line below:
+      this->deviceStatus = {.redLedVoltage = 0,
+                            .infraRedLedVoltage = 0,
+                            .rawPhotodiodeVoltage = 0,
+                            .eventSequenceStartTimeUs = 0,
+                            .eventSequenceEndTimeUs = 0,
+                            .deviceState = RedLedOn};
       break;
     case DeviceIdling:
       // Code to execute when DeviceIdling
+      // FIXME Boilerplate code at line below:
+      this->deviceStatus = {.redLedVoltage = 0,
+                            .infraRedLedVoltage = 0,
+                            .rawPhotodiodeVoltage = 0,
+                            .eventSequenceStartTimeUs = 0,
+                            .eventSequenceEndTimeUs = 0,
+                            .deviceState = RedLedOn};
       break;
     case GettingEventSequenceStartTime:
       // Code to execute when GettingEventSequenceStartTime
+      this->deviceStatus.eventSequenceStartTimeUs =
+          this->helperClassInstance.ppgSignalControllerPtr->getCurrentTimeUs();
+
       break;
     case GettingEventSequenceEndTime:
       // Code to execute when GettingEventSequenceEndTime
+      this->deviceStatus.eventSequenceEndTimeUs =
+          this->helperClassInstance.ppgSignalControllerPtr->getCurrentTimeUs();
+
       break;
     default:
       // Code to execute when 'state' is not any of the above cases
       break;
   }
 
-  // Decide what to do next
+  // Decide what is the next state
 
   /*
 // Check which LED is on from the class
