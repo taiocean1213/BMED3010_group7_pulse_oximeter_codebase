@@ -21,7 +21,8 @@ class HeartRateCalculator : public HeartRateCalculatorInterface<element_type> {
    * @param data A vector of integers representing the heart rate data.
    * @return The calculated heart rate.
    */
-  element_type calculate(std::vector<element_type>& data) override;
+  element_type calculate(
+      SignalHistoryInterface<element_type>* dataPtr) override;
 };
 
 #endif

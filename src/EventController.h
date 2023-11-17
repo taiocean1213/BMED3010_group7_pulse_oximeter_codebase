@@ -44,7 +44,6 @@ class EventController : public EventControllerInterface {
                                          pin_id_data_type>*
         ppgSignalControllerPtr;
     DisplayInterface<voltage_data_type>* displayPtr;
-    SignalHistoryInterface<voltage_data_type>* signalHistoryPtr;
     FastFourierTransformInterface<voltage_data_type>* fftPtr;
     FilterInterface<voltage_data_type, voltage_data_type>* filterPtr;
     SpO2CalculatorInterface<voltage_data_type>* spO2CalculatorPtr;
@@ -58,10 +57,12 @@ class EventController : public EventControllerInterface {
     UiIsUpdating,
     SignalIsProcessing,
     DeviceIdling,
-    GettingEventSequenceStartTime,
-    GettingEventSequenceEndTime
+    EventSequenceStarting,
+    EventSequenceEnding,
+    DeviceStateTotal
   } DeviceState;
 
+  // Struct members that can be configured for the device.
   typedef struct DeviceSettings {
     int analogResolutionValue;
     int baudRate;
@@ -71,29 +72,32 @@ class EventController : public EventControllerInterface {
     std::vector<std::pair<voltage_data_type, voltage_data_type>> stopbandsHz;
     voltage_data_type samplingFrequencyHz;
     voltage_data_type signalHistoryElementsCount;
+    voltage_data_type photoDiodeWarmupTimeUs;
   } device_settings_data_type;
 
+  // Struct members that can be actively controlled by the device.
   typedef struct DeviceStatus {
     voltage_data_type redLedVoltage;
     voltage_data_type infraRedLedVoltage;
-    voltage_data_type rawPhotodiodeVoltage;
-    time_data_type eventSequenceStartTimeUs;
-    time_data_type eventSequenceEndTimeUs;
     DeviceState deviceState;
+    int statesCompleted[DeviceStateTotal];
   } device_status_data_type;
 
+  // Struct members that is measured and recorded by the device.
   typedef struct DeviceMemory {
-    voltage_data_type redLedVoltage;
-    voltage_data_type infraRedLedVoltage;
     voltage_data_type rawPhotodiodeVoltage;
     time_data_type eventSequenceStartTimeUs;
     time_data_type eventSequenceEndTimeUs;
-    DeviceState deviceState;
+    SignalHistoryInterface<voltage_data_type>* rawRedPPGSignalHistoryPtr;
+    SignalHistoryInterface<voltage_data_type>* filteredRedPPGSignalHistoryPtr;
+    SignalHistoryInterface<voltage_data_type>* rawInfraRedPPGSignalHistoryPtr;
+    SignalHistoryInterface<voltage_data_type>*
+        filteredInfraRedPPGSignalHistoryPtr;
   } device_memory_data_type;
 
   helper_class_instance_data_type helperClassInstance;
   device_settings_data_type deviceSettings;
-  device_status_data_type deviceMemory;
+  device_memory_data_type deviceMemory;
   device_status_data_type deviceStatus;
 };
 

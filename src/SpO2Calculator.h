@@ -21,7 +21,8 @@ class SpO2Calculator : public SpO2CalculatorInterface<element_type> {
    * @param data A vector of floats representing the SpO2 data.
    * @return The calculated SpO2.
    */
-  element_type calculate(std::vector<element_type>& data) override;
+  element_type calculate(
+      SignalHistoryInterface<element_type>* dataPtr) override;
 };
 
 #endif

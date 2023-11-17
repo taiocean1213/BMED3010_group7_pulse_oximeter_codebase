@@ -1,39 +1,46 @@
 #include "SignalHistory.h"
 
-#include <deque>
+// if needed, `#include <stdexcept>` can Include this header file to use
+// the `std::out_of_range`
+#include <vector>
 
 /**
  * @brief Constructs a new SignalHistory object.
  *
- * This constructor initializes an empty list with a size of arraySize.
+ * This constructor initializes an empty vector with a size of arraySize.
+ *
+ * @param arraySize The size of the vector.
  */
 template <class element_type>
 SignalHistory<element_type>::SignalHistory(element_type arraySize) {
-  // Initialize the deque with a size of arraySize
+  // Initialize the vector with a size of arraySize
   history.resize(arraySize);
 };
 
 /**
  * @brief Destructs a new SignalHistory object.
  *
- * This constructor deletes the empty list.
+ * This destructor is automatically called when the vector goes out of scope,
+ * so there's no need to manually call the destructor of the vector.
  */
 template <class element_type>
-SignalHistory<element_type>::~SignalHistory() {
-  this->history.~deque();
+SignalHistory<element_type>::~SignalHistory(){
+    // The destructor of the vector is automatically called when the vector goes
+    // out of scope
 };
 
 /**
- * @brief Adds a signal to the history as a
- * @param signal The signal to be added to the history.
+ * @brief Adds a signal to the history.
  *
  * If the history is full, remove the oldest signal before adding the new one.
+ *
+ * @param signal The signal to be added to the history.
  */
 template <class element_type>
 void SignalHistory<element_type>::put(element_type signal) {
   // If the history is full, remove the oldest signal
   if (history.size() == history.max_size()) {
-    history.pop_front();
+    history.erase(history.begin());
   }
   // Add the new signal to the history
   history.push_back(signal);
@@ -45,13 +52,20 @@ void SignalHistory<element_type>::put(element_type signal) {
  * @param nthSample The index of the signal to be retrieved from the history.
  * @return The signal at the given index.
  *
- * This function uses the at function to access the signal at the given index.
- * If the index is out of range, it throws an std::out_of_range exception.
+ * This function checks if nthSample is a valid index before calling the at
+ * function. If nthSample is not a valid index, it throws an std::out_of_range
+ * exception.
  */
 template <class element_type>
 element_type SignalHistory<element_type>::get(element_type nthSample) {
-  // Return the signal at the given index
-  return history.at(nthSample);
+  // Check if nthSample is a valid index
+  if (nthSample < history.size()) {
+    // Return the signal at the given index
+    return history.at(nthSample);
+  } else {
+    // Throw an exception if nthSample is not a valid index
+    // e.g. `throw std::out_of_range("Index out of range");`
+  }
 };
 
 /**
@@ -77,7 +91,12 @@ void SignalHistory<element_type>::reset() {
 template <class element_type>
 element_type SignalHistory<element_type>::getEntryPointIndex() {
   // Return the index where the next signal will be stored in the history
-  return history.size();
+  // If the history is full, return 0
+  if (history.size() == history.max_size()) {
+    return 0;
+  } else {
+    return history.size();
+  }
 };
 
 /**

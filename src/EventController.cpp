@@ -22,17 +22,43 @@
 template <class voltage_data_type, class time_data_type, class pin_id_data_type>
 EventController<voltage_data_type, time_data_type,
                 pin_id_data_type>::EventController() {
-  // initialize the variables containing the device settings
-  this->deviceSettings = {
-      12,                // analogResolutionValue
-      38400,             // baudRate
-      0,                 // minOutputVoltage
-      3.3,               // maxOutputVoltage
-      {{1, 2}, {3, 4}},  // passbandsHz
-      {{5, 6}, {7, 8}},  // stopbandsHz
-      40,                // samplingFrequencyHz
-      50                 // signalHistoryElementsCount
+  // initialize the device settings
+  this->deviceSettings = {.analogResolutionValue = 12,
+                          .baudRate = 38400,
+                          .minOutputVoltage = 0,
+                          .maxOutputVoltage = 3.3,
+                          .passbandsHz = {{1, 2}, {3, 4}},
+                          .stopbandsHz = {{5, 6}, {7, 8}},
+                          .samplingFrequencyHz = 40,
+                          .signalHistoryElementsCount = 50,
+                          .photoDiodeWarmupTimeUs = 200};
+
+  // Set up the deviceStatus of class for data recording
+  this->deviceStatus = {
+      .redLedVoltage = 0, .infraRedLedVoltage = 0, .deviceState = RedLedOn};
+
+  for (int i = 0; i < DeviceStateTotal; ++i)
+    this->deviceStatus.statesCompleted[i] = 0;
+
+  // Set up the deviceStatus of class for data recording
+  this->deviceMemory = {
+      .rawPhotodiodeVoltage = 0,
+      .eventSequenceStartTimeUs = 0,
+      .eventSequenceEndTimeUs = 0,
+      .rawRedPPGSignalHistoryPtr = new SignalHistory<voltage_data_type>(
+          this->deviceSettings.signalHistoryElementsCount),
+      .filteredRedPPGSignalHistoryPtr = new SignalHistory<voltage_data_type>(
+          this->deviceSettings.signalHistoryElementsCount),
+      .rawInfraRedPPGSignalHistoryPtr = new SignalHistory<voltage_data_type>(
+          this->deviceSettings.signalHistoryElementsCount),
+      .filteredInfraRedPPGSignalHistoryPtr =
+          new SignalHistory<voltage_data_type>(
+              this->deviceSettings.signalHistoryElementsCount),
   };
+  this->deviceMemory.rawRedPPGSignalHistoryPtr->reset();
+  this->deviceMemory.filteredRedPPGSignalHistoryPtr->reset();
+  this->deviceMemory.rawInfraRedPPGSignalHistoryPtr->reset();
+  this->deviceMemory.filteredInfraRedPPGSignalHistoryPtr->reset();
 
   // Initialize the objects using new keyword
   this->helperClassInstance = {
@@ -49,9 +75,6 @@ EventController<voltage_data_type, time_data_type,
 
       .displayPtr = new Display<voltage_data_type>(),
 
-      .signalHistoryPtr = new SignalHistory<voltage_data_type>(
-          this->deviceSettings.signalHistoryElementsCount),
-
       .fftPtr = new FastFourierTransform<voltage_data_type>(),
 
       .filterPtr = new Filter<voltage_data_type, voltage_data_type>(
@@ -66,15 +89,6 @@ EventController<voltage_data_type, time_data_type,
   };
 
   this->helperClassInstance.displayPtr->begin();
-  this->helperClassInstance.signalHistoryPtr->reset();
-
-  // Set up the deviceStatus of class
-  this->deviceStatus = {.redLedVoltage = 0,
-                        .infraRedLedVoltage = 0,
-                        .rawPhotodiodeVoltage = 0,
-                        .eventSequenceStartTimeUs = 0,
-                        .eventSequenceEndTimeUs = 0,
-                        .deviceState = RedLedOn};
 };
 
 /**
@@ -90,11 +104,16 @@ EventController<voltage_data_type, time_data_type,
   delete this->helperClassInstance.hardwareLayerPtr;
   delete this->helperClassInstance.ppgSignalControllerPtr;
   delete this->helperClassInstance.displayPtr;
-  delete this->helperClassInstance.signalHistoryPtr;
   delete this->helperClassInstance.fftPtr;
   delete this->helperClassInstance.filterPtr;
   delete this->helperClassInstance.spO2CalculatorPtr;
   delete this->helperClassInstance.heartRateCalculatorPtr;
+
+  // delete this->deviceMemory objects
+  delete this->deviceMemory.rawRedPPGSignalHistoryPtr;
+  delete this->deviceMemory.filteredRedPPGSignalHistoryPtr;
+  delete this->deviceMemory.rawInfraRedPPGSignalHistoryPtr;
+  delete this->deviceMemory.filteredInfraRedPPGSignalHistoryPtr;
 };
 
 /**
@@ -109,77 +128,40 @@ void EventController<voltage_data_type, time_data_type,
   // Check for the state of the program
   DeviceState currentState = deviceStatusStructPtr->deviceState;
 
-  // Branch off to check for creating flags for the corresponding action to take
+  // Branch off to check for creating flags for the corresponding action to
+  // take. Input for the current state
   switch (currentState) {
     case RedLedOn:
-      // Code to execute when RedLedOn
-      // FIXME Boilerplate code at line below:
-      this->deviceStatus = {.redLedVoltage = 0,
-                            .infraRedLedVoltage = 0,
-                            .rawPhotodiodeVoltage = 0,
-                            .eventSequenceStartTimeUs = 0,
-                            .eventSequenceEndTimeUs = 0,
-                            .deviceState = RedLedOn};
+      // Code to execute when RedLedOn.
       break;
     case InfraRedLedOn:
-      // Code to execute when InfraRedLedOn
-      // FIXME Boilerplate code at line below:
-      this->deviceStatus = {.redLedVoltage = 0,
-                            .infraRedLedVoltage = 0,
-                            .rawPhotodiodeVoltage = 0,
-                            .eventSequenceStartTimeUs = 0,
-                            .eventSequenceEndTimeUs = 0,
-                            .deviceState = RedLedOn};
+      // Change the LED status based on above modification
       break;
     case PhotoDetectorReading:
-      // Code to execute when PhotoDetectorReading
-      // FIXME Boilerplate code at line below:
-      this->deviceStatus = {.redLedVoltage = 0,
-                            .infraRedLedVoltage = 0,
-                            .rawPhotodiodeVoltage = 0,
-                            .eventSequenceStartTimeUs = 0,
-                            .eventSequenceEndTimeUs = 0,
-                            .deviceState = RedLedOn};
+      // Code to execute when PhotoDetectorReading.
+      this->deviceMemory.rawPhotodiodeVoltage =
+          this->helperClassInstance.ppgSignalControllerPtr
+              ->getPhotoDiodeVoltage(
+                  this->deviceSettings.photoDiodeWarmupTimeUs);
       break;
     case UiIsUpdating:
       // Code to execute when UiIsUpdating
-      // FIXME Boilerplate code at line below:
-      this->deviceStatus = {.redLedVoltage = 0,
-                            .infraRedLedVoltage = 0,
-                            .rawPhotodiodeVoltage = 0,
-                            .eventSequenceStartTimeUs = 0,
-                            .eventSequenceEndTimeUs = 0,
-                            .deviceState = RedLedOn};
       break;
     case SignalIsProcessing:
       // Code to execute when SignalIsProcessing
-      // FIXME Boilerplate code at line below:
-      this->deviceStatus = {.redLedVoltage = 0,
-                            .infraRedLedVoltage = 0,
-                            .rawPhotodiodeVoltage = 0,
-                            .eventSequenceStartTimeUs = 0,
-                            .eventSequenceEndTimeUs = 0,
-                            .deviceState = RedLedOn};
       break;
     case DeviceIdling:
       // Code to execute when DeviceIdling
-      // FIXME Boilerplate code at line below:
-      this->deviceStatus = {.redLedVoltage = 0,
-                            .infraRedLedVoltage = 0,
-                            .rawPhotodiodeVoltage = 0,
-                            .eventSequenceStartTimeUs = 0,
-                            .eventSequenceEndTimeUs = 0,
-                            .deviceState = RedLedOn};
       break;
-    case GettingEventSequenceStartTime:
-      // Code to execute when GettingEventSequenceStartTime
-      this->deviceStatus.eventSequenceStartTimeUs =
+    case EventSequenceStarting:
+      // Code to execute when EventSequenceStarting
+      this->deviceMemory.eventSequenceStartTimeUs =
           this->helperClassInstance.ppgSignalControllerPtr->getCurrentTimeUs();
 
       break;
-    case GettingEventSequenceEndTime:
-      // Code to execute when GettingEventSequenceEndTime
-      this->deviceStatus.eventSequenceEndTimeUs =
+    case EventSequenceEnding:
+      // Code to execute when EventSequenceEnding
+      this->deviceMemory.eventSequenceEndTimeUs =
           this->helperClassInstance.ppgSignalControllerPtr->getCurrentTimeUs();
 
       break;
@@ -188,8 +170,139 @@ void EventController<voltage_data_type, time_data_type,
       break;
   }
 
-  // Decide what is the next state
+  // Computing for the actions current state.
+  switch (currentState) {
+    case RedLedOn:
+      // Code to execute when RedLedOn.
+      this->deviceStatus.redLedVoltage = this->deviceSettings.maxOutputVoltage;
+      this->deviceStatus.infraRedLedVoltage =
+          this->deviceSettings.minOutputVoltage;
+      break;
+    case InfraRedLedOn:
+      this->deviceStatus.redLedVoltage = this->deviceSettings.minOutputVoltage;
+      this->deviceStatus.infraRedLedVoltage =
+          this->deviceSettings.maxOutputVoltage;
+      break;
+    case PhotoDetectorReading:
+      // Code to execute when PhotoDetectorReading.
+      break;
+    case UiIsUpdating:
+      // Code to execute when UiIsUpdating
+      break;
+    case SignalIsProcessing:
+      // Code to execute when SignalIsProcessing
+      break;
+    case DeviceIdling:
+      // Code to execute when DeviceIdling
+      break;
+    case EventSequenceStarting:
+      // Code to execute when EventSequenceStarting
+      break;
+    case EventSequenceEnding:
+      // Code to execute when EventSequenceEnding
+      break;
+    default:
+      // Code to execute when 'state' is not any of the above cases
+      break;
+  }
 
+  // Performing actions for the current state.
+  switch (currentState) {
+    case RedLedOn:
+      // Code to execute when RedLedOn.
+      this->helperClassInstance.ppgSignalControllerPtr->setRedLED(
+          this->deviceStatus.redLedVoltage);
+      this->helperClassInstance.ppgSignalControllerPtr->setInfraRedLED(
+          this->deviceStatus.infraRedLedVoltage);
+      break;
+    case InfraRedLedOn:
+      // Change the LED status based on above modification
+      this->helperClassInstance.ppgSignalControllerPtr->setRedLED(
+          this->deviceStatus.redLedVoltage);
+      this->helperClassInstance.ppgSignalControllerPtr->setInfraRedLED(
+          this->deviceStatus.infraRedLedVoltage);
+    case PhotoDetectorReading:
+      // Code to execute when PhotoDetectorReading.
+      if (this->deviceStatus.statesCompleted[RedLedOn] >
+          this->deviceStatus.statesCompleted[InfraRedLedOn]) {
+        this->deviceMemory.rawRedPPGSignalHistoryPtr->put(
+            this->deviceMemory.rawPhotodiodeVoltage);
+      } else if (this->deviceStatus.statesCompleted[RedLedOn] ==
+                 this->deviceStatus.statesCompleted[InfraRedLedOn]) {
+        this->deviceMemory.rawInfraRedPPGSignalHistoryPtr->put(
+            this->deviceMemory.rawPhotodiodeVoltage);
+      } else {
+        // assert an error.
+      }
+      break;
+    case UiIsUpdating:
+      // TODO Code to execute when UiIsUpdating
+      /*
+      this->helperClassInstance.displayPtr->updateSpO2(
+          values_data_type spo2_value);
+      this->helperClassInstance.displayPtr->updateHBR(
+          values_data_type spo2_value);
+      this->helperClassInstance.displayPtr->updatePPGWave(
+          values_data_type ppg_values[], int num_values,
+          values_data_type min_ppg_value, values_data_type max_ppg_value);
+      */
+      break;
+    case SignalIsProcessing:
+      //  TODO Code to execute when SignalIsProcessing
+      /*
+      this->deviceMemory.filteredRedPPGSignalHistoryPtr =
+          &this->helperClassInstance.filterPtr->process();
+      this->deviceMemory.filteredInfraRedPPGSignalHistoryPtr =
+          &this->helperClassInstance.filterPtr->process();
+      */
+      break;
+    case DeviceIdling:
+      // Code to execute when DeviceIdling
+      break;
+    case EventSequenceStarting:
+      // Code to execute when EventSequenceStarting
+      for (int i = 0; i < DeviceStateTotal; ++i)
+        this->deviceStatus.statesCompleted[i] = 0;
+      break;
+    case EventSequenceEnding:
+      // Code to execute when EventSequenceEnding
+      break;
+    default:
+      // Code to execute when 'state' is not any of the above cases
+      break;
+  }
+  ++(this->deviceStatus.statesCompleted[currentState]);
+
+  // Calculating and deciding what the next state is.
+  switch (currentState) {
+    case RedLedOn:
+      // Code to execute when RedLedOn.
+      break;
+    case InfraRedLedOn:
+      // Change the LED status based on above modification
+      break;
+    case PhotoDetectorReading:
+      // Code to execute when PhotoDetectorReading.
+      break;
+    case UiIsUpdating:
+      // Code to execute when UiIsUpdating
+      break;
+    case SignalIsProcessing:
+      // Code to execute when SignalIsProcessing
+      break;
+    case DeviceIdling:
+      // Code to execute when DeviceIdling
+      break;
+    case EventSequenceStarting:
+      // Code to execute when EventSequenceStarting
+      break;
+    case EventSequenceEnding:
+      // Code to execute when EventSequenceEnding
+      break;
+    default:
+      // Code to execute when 'state' is not any of the above cases
+      break;
+  }
   /*
 // Check which LED is on from the class
 bool isRedLedOn = ppgSignalControllerPtr->getRedLED();
@@ -208,17 +321,17 @@ voltage_data_type photodiodeVoltage =
 ppgSignalControllerPtr->getPhotoDiodeVoltage(200);
 
 // Store the signal to the corresponding SignalHistory class
-signalHistoryPtr->put(photodiodeVoltage);
+rawRedPPGSignalHistoryPtr->put(photodiodeVoltage);
 
 // Check if the time since the last timestamp was set from 1/60 seconds ago
-if (!((signalHistoryPtr->getEntryPointIndex() == 1 / 60))) {
+if (!((rawRedPPGSignalHistoryPtr->getEntryPointIndex() == 1 / 60))) {
 return;
 }
 
 // Apply the filter to the signal
 std::vector<voltage_data_type> filteredSignal =
 filterPtr->filter(fftPtr->fastFourierTransform(
-signalHistoryPtr->get(nthSample)));
+rawRedPPGSignalHistoryPtr->get(nthSample)));
 
 // Update the filteredSignal Class and update to the class method of `Display`
 displayPtr->updatePPGWave(filteredSignal.data(),

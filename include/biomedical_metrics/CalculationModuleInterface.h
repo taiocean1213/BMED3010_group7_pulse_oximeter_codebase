@@ -9,9 +9,11 @@
 
 #include <vector>
 
+#include "signal_history/SignalHistoryInterface.h"
+
 template <class element_type>
 class CalculationModuleInterface {
-  virtual element_type calculate(std::vector<element_type>&) = 0;
+  virtual element_type calculate(SignalHistoryInterface<element_type>*) = 0;
 };
 
 #endif

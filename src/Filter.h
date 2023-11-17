@@ -35,16 +35,15 @@ class Filter : public FilterInterface<element_data_type, frequency_datatype> {
       FastFourierTransformInterface<element_data_type>* fftClassInstance);
 
   /**
-   * @brief Apply the filter to the given data.
+   * @brief Apply the filter to the given data based on the configuration set by
+   * the arguments passed to the constructor.
    *
-   * This function applies the filter to the provided input data based on the
-   * configuration set by the arguments passed to the constructor.
-   *
-   * @param filterInput A vector that needs to be filtered.
-   * @return The filtered output data.
+   * @param filterInput The input data to be filtered.
+   * @param filterOutput The output data after filtering.
    */
-  std::vector<element_data_type> process(
-      std::vector<element_data_type> filterInput) override;
+  void process(
+      SignalHistoryInterface<element_data_type>* filterInputPtr,
+      SignalHistoryInterface<element_data_type>* filterOutputPtr) override;
 
  private:
   FastFourierTransformInterface<element_data_type>*

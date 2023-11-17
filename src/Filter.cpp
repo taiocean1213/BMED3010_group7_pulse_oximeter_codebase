@@ -24,19 +24,18 @@ Filter<element_data_type, frequency_datatype>::Filter(
   // the
   // specific requirements of your filter.
 };
+
 /**
- * @brief Apply the filter to the given data.
+ * @brief Apply the filter to the given data based on the configuration set by
+ * the arguments passed to the constructor.
  *
- * This function applies the filter to the provided input data based on the
- * configuration set by the arguments passed to the constructor.
- *
- * @param filterInput A vector that needs to be filtered.
- * @return The filtered output data.
+ * @param filterInput The input data to be filtered.
+ * @param filterOutput The output data after filtering.
  */
 template <typename element_data_type, typename frequency_datatype>
-std::vector<element_data_type>
-Filter<element_data_type, frequency_datatype>::process(
-    std::vector<element_data_type> filterInput) {
+void Filter<element_data_type, frequency_datatype>::process(
+    SignalHistoryInterface<element_data_type>* filterInputPtr,
+    SignalHistoryInterface<element_data_type>* filterOutputPtr) {
   // Apply the filter to the provided input data based on the configuration set
   // by the arguments passed to the constructor. The actual implementation
   // depends on the specific requirements of your filter.
@@ -45,7 +44,7 @@ Filter<element_data_type, frequency_datatype>::process(
   // FastFourierTransformInterface instance:
   // std::vector<element_data_type> transformedInput =
   //     fft_.fastFourierTransform(filterInput);
-  std::vector<element_data_type> filteredOutput;
+  // std::vector<element_data_type> filteredOutput;
 
   // Apply the passbands and stopbands to the transformed input to produce the
   // filtered output. This is a placeholder implementation and should be
@@ -56,6 +55,4 @@ Filter<element_data_type, frequency_datatype>::process(
   //     filteredOutput.push_back(data);
   //   }
   // }
-
-  return filteredOutput;
 }

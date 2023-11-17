@@ -1,7 +1,7 @@
 #ifndef FILTERINTERFACE_H
 #define FILTERINTERFACE_H
 
-#include <vector>
+#include "signal_history/SignalHistoryInterface.h"
 
 /**
  * @brief Interface for a filter.
@@ -20,10 +20,11 @@ class FilterInterface {
    * the arguments passed to the constructor.
    *
    * @param filterInput The input data to be filtered.
-   * @return The filtered output data.
+   * @param filterOutput The output data after filtering.
    */
-  virtual std::vector<element_data_type> process(
-      std::vector<element_data_type> filterInput) = 0;
+  virtual void process(
+      SignalHistoryInterface<element_data_type>* filterInputPtr,
+      SignalHistoryInterface<element_data_type>* filterOutputPtr) = 0;
 };
 
 #endif
