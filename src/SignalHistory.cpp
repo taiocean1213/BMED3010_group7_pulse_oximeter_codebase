@@ -2,6 +2,7 @@
 
 // if needed, `#include <stdexcept>` can Include this header file to use
 // the `std::out_of_range`
+#include <algorithm>
 #include <vector>
 
 /**
@@ -66,6 +67,36 @@ element_type SignalHistory<element_type>::get(element_type nthSample) {
     // Throw an exception if nthSample is not a valid index
     // e.g. `throw std::out_of_range("Index out of range");`
   }
+};
+
+/**
+ * @brief Retrieves the smallest signal from the history.
+ *
+ * @return The smallest signal value.
+ *
+ */
+template <class element_type>
+element_type SignalHistory<element_type>::min() {
+  if (history.empty()) {
+    //`throw std::runtime_error("History is empty");`
+  }
+  // Return the smallest signal in the history
+  return *std::min_element(history.begin(), history.end());
+};
+
+/**
+ * @brief Retrieves the largest signal from the history.
+ *
+ * @return The largest signal value.
+ *
+ */
+template <class element_type>
+element_type SignalHistory<element_type>::max() {
+  if (history.empty()) {
+    //`throw std::runtime_error("History is empty");`
+  }
+  // Return the largest signal in the history
+  return *std::max_element(history.begin(), history.end());
 };
 
 /**

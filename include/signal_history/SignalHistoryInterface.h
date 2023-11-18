@@ -33,6 +33,26 @@ class SignalHistoryInterface {
   virtual element_type get(element_type nthSample) = 0;
 
   /**
+   * @brief Retrieves the smallest signal from the history.
+   *
+   * @return The smallest signal value.
+   *
+   * This is a pure virtual function, it must be overridden in any non-abstract
+   * child class.
+   */
+  virtual element_type min() = 0;
+
+  /**
+   * @brief Retrieves the largest signal from the history.
+   *
+   * @return The largest signal value.
+   *
+   * This is a pure virtual function, it must be overridden in any non-abstract
+   * child class.
+   */
+  virtual element_type max() = 0;
+
+  /**
    * @brief Resets the history.
    *
    * This is a pure virtual function, it must be overridden in any non-abstract

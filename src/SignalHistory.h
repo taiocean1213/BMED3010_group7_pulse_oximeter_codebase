@@ -50,6 +50,22 @@ class SignalHistory : public SignalHistoryInterface<element_type> {
   element_type get(element_type nthSample) override;
 
   /**
+   * @brief Retrieves the smallest signal from the history.
+   *
+   * @return The smallest signal value.
+   *
+   */
+  element_type min() override;
+
+  /**
+   * @brief Retrieves the largest signal from the history.
+   *
+   * @return The largest signal value.
+   *
+   */
+  element_type max() override;
+
+  /**
    * @brief Resets the history.
    *
    * This function clears the history.
