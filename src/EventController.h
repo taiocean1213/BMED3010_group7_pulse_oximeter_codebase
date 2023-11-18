@@ -138,6 +138,8 @@ class EventController : public EventControllerInterface {
     voltage_data_type rawPhotodiodeVoltage;
     time_data_type eventSequenceStartTimeUs;
     time_data_type eventSequenceEndTimeUs;
+    time_data_type lastDisplayUpdateTime;         // TODO
+    time_data_type lastFilteredSignalUpdateTime;  // TODO
     SignalHistoryInterface<voltage_data_type>* rawRedPPGSignalHistoryPtr;
     SignalHistoryInterface<voltage_data_type>* filteredRedPPGSignalHistoryPtr;
     SignalHistoryInterface<voltage_data_type>* rawInfraRedPPGSignalHistoryPtr;

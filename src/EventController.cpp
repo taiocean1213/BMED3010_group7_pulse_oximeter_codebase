@@ -49,6 +49,8 @@ EventController<voltage_data_type, time_data_type,
       .rawPhotodiodeVoltage = 0,
       .eventSequenceStartTimeUs = 0,
       .eventSequenceEndTimeUs = 0,
+      .lastDisplayUpdateTime = 0,
+      .lastFilteredSignalUpdateTime = 0,
       .rawRedPPGSignalHistoryPtr = new SignalHistory<voltage_data_type>(
           this->deviceSettings.signalHistoryElementsCount),
       .filteredRedPPGSignalHistoryPtr = new SignalHistory<voltage_data_type>(
@@ -149,7 +151,10 @@ void EventController<voltage_data_type, time_data_type,
 
   // Calculating the next state
   DeviceState nextState = this->calculateNextState(currentState);
-}
+
+  // Assigning the nextState to the deviceStatusStructPtr->deviceState
+  deviceStatusStructPtr->deviceState = nextState;
+};
 
 /**
  * @brief Checks the current state of the program.
@@ -201,7 +206,7 @@ void EventController<voltage_data_type, time_data_type, pin_id_data_type>::
       // Code to execute when 'state' is not any of the above cases
       break;
   }
-}
+};
 
 /**
  * @brief Performs actions based on the current state of the program.
@@ -310,7 +315,7 @@ void EventController<voltage_data_type, time_data_type, pin_id_data_type>::
       // No specific code to execute for the default case.
       break;
   }
-}
+};
 
 /**
  * @brief Calculates the next state of the program based on the current state.
@@ -327,38 +332,60 @@ DeviceState EventController<
     pin_id_data_type>::calculateNextState(DeviceState currentState) {
   // Calculating and deciding what the next state is.
   DeviceState nextState;
+
+  // Get the current time of the program
+  time_data_type timeNowUs =
+      this->helperClassInstance.ppgSignalControllerPtr->getCurrentTimeUs();
   switch (currentState) {
     case RedLedOn:
-      // Code to execute when RedLedOn.
+      // Transition to the next state after RedLedOn.
+      nextState = PhotoDetectorReading;
       break;
     case InfraRedLedOn:
-      // Change the LED status based on above modification
+      // Transition to the next state after InfraRedLedOn.
+      nextState = PhotoDetectorReading;
       break;
     case PhotoDetectorReading:
-      // Code to execute when PhotoDetectorReading.
+      // Transition to the next state after PhotoDetectorReading.
+      if (true) { /*TODO branch off based on last update time*/
+        nextState = UiIsUpdating;
+      } else if (true) {
+        nextState = SignalIsProcessing;
+      } else {
+        nextState = DeviceIdling;
+      }
       break;
     case UiIsUpdating:
-      // Code to execute when UiIsUpdating
+      // Transition to the next state after UiIsUpdating.
+      nextState = DeviceIdling;
       break;
     case SignalIsProcessing:
-      // Code to execute when SignalIsProcessing
+      // Transition to the next state after SignalIsProcessing.
+      nextState = DeviceIdling;
       break;
     case DeviceIdling:
-      // Code to execute when DeviceIdling
+      // Transition to the next state after DeviceIdling.
+      nextState = EventSequenceEnding;
       break;
     case EventSequenceStarting:
-      // Code to execute when EventSequenceStarting
+      // Transition to the next state after EventSequenceStarting.
+      if (true) { /*TODO branch off based on last update time*/
+        nextState = RedLedOn;
+      } else {
+        nextState = InfraRedLedOn;
+      }
       break;
     case EventSequenceEnding:
-      // Code to execute when EventSequenceEnding
+      // Transition to the next state after EventSequenceEnding.
+      nextState = EventSequenceStarting;  // Loop back to the beginning.
       break;
     default:
-      // Code to execute when 'state' is not any of the above cases
-      // Assert an error
+      // Default case, return the current state.
+      nextState = currentState;
       break;
   }
   return nextState;
-}
+};
 
 /**
  * @brief Updates the count of events for the current state.
@@ -371,4 +398,4 @@ template <class voltage_data_type, class time_data_type, class pin_id_data_type>
 void EventController<voltage_data_type, time_data_type, pin_id_data_type>::
     updateStateEventCount(DeviceState currentState) {
   ++(this->deviceStatus.statesCompleted[currentState]);
-}
+};
