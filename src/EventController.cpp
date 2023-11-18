@@ -21,26 +21,30 @@
  */
 template <class voltage_data_type, class time_data_type, class pin_id_data_type>
 EventController<voltage_data_type, time_data_type,
-                pin_id_data_type>::EventController() {
-  // initialize the device settings
-  this->deviceSettings = {.analogResolutionValue = 12,
-                          .baudRate = 38400,
-                          .minOutputVoltage = 0,
-                          .maxOutputVoltage = 3.3,
-                          .passbandsHz = {{1, 2}, {3, 4}},
-                          .stopbandsHz = {{5, 6}, {7, 8}},
-                          .samplingFrequencyHz = 40,
-                          .signalHistoryElementsCount = 50,
-                          .photoDiodeWarmupTimeUs = 200};
-
-  // Set up the deviceStatus of class for data recording
-  this->deviceStatus = {
-      .redLedVoltage = 0, .infraRedLedVoltage = 0, .deviceState = RedLedOn};
-
+                pin_id_data_type>::EventController()
+    : deviceSettings{.analogResolutionValue = 12,
+                     .baudRate = 38400,
+                     .minOutputVoltage = 0,
+                     .maxOutputVoltage = 3.3,
+                     .passbandsHz = {{1, 2}, {3, 4}},
+                     .stopbandsHz = {{5, 6}, {7, 8}},
+                     .samplingFrequencyHz = 40,
+                     .signalHistoryElementsCount = 50,
+                     .photoDiodeWarmupTimeUs = 200},
+      deviceStatus{
+          .redLedVoltage = 0, .infraRedLedVoltage = 0, .deviceState = RedLedOn},
+      helperClassInstance{.hardwareLayerPtr = nullptr,
+                          .ppgSignalControllerPtr = nullptr,
+                          .displayPtr = nullptr,
+                          .fftPtr = nullptr,
+                          .filterPtr = nullptr,
+                          .spO2CalculatorPtr = nullptr,
+                          .heartRateCalculatorPtr = nullptr} {
+  // Initialize all statesCompleted to 0
   for (int i = 0; i < DeviceStateTotal; ++i)
     this->deviceStatus.statesCompleted[i] = 0;
 
-  // Set up the deviceStatus of class for data recording
+  // Initialize deviceMemory
   this->deviceMemory = {
       .rawPhotodiodeVoltage = 0,
       .eventSequenceStartTimeUs = 0,
@@ -54,42 +58,45 @@ EventController<voltage_data_type, time_data_type,
       .filteredInfraRedPPGSignalHistoryPtr =
           new SignalHistory<voltage_data_type>(
               this->deviceSettings.signalHistoryElementsCount),
-
       .spO2Value = 0,
       .heartBeatRateValue = 0,
   };
+
+  // Reset all signal histories
   this->deviceMemory.rawRedPPGSignalHistoryPtr->reset();
   this->deviceMemory.filteredRedPPGSignalHistoryPtr->reset();
   this->deviceMemory.rawInfraRedPPGSignalHistoryPtr->reset();
   this->deviceMemory.filteredInfraRedPPGSignalHistoryPtr->reset();
 
-  // Initialize the objects using new keyword
-  this->helperClassInstance = {
-      .hardwareLayerPtr = new HardwareAbstractionLayer<
-          voltage_data_type, time_data_type, pin_id_data_type>(
+  // Initialize helperClassInstance objects
+  this->helperClassInstance.hardwareLayerPtr =
+      new HardwareAbstractionLayer<voltage_data_type, time_data_type,
+                                   pin_id_data_type>(
           this->deviceSettings.analogResolutionValue,
           this->deviceSettings.baudRate, this->deviceSettings.minOutputVoltage,
-          this->deviceSettings.maxOutputVoltage),
+          this->deviceSettings.maxOutputVoltage);
 
-      .ppgSignalControllerPtr =
-          new PPGSignalHardwareController<voltage_data_type, time_data_type,
-                                          pin_id_data_type>(
-              this->helperClassInstance.hardwareLayerPtr),
+  this->helperClassInstance.ppgSignalControllerPtr =
+      new PPGSignalHardwareController<voltage_data_type, time_data_type,
+                                      pin_id_data_type>(
+          this->helperClassInstance.hardwareLayerPtr);
 
-      .displayPtr = new Display<voltage_data_type>(),
+  this->helperClassInstance.displayPtr = new Display<voltage_data_type>();
 
-      .fftPtr = new FastFourierTransform<voltage_data_type>(),
+  this->helperClassInstance.fftPtr =
+      new FastFourierTransform<voltage_data_type>();
 
-      .filterPtr = new Filter<voltage_data_type, voltage_data_type>(
+  this->helperClassInstance.filterPtr =
+      new Filter<voltage_data_type, voltage_data_type>(
           this->deviceSettings.passbandsHz, this->deviceSettings.stopbandsHz,
           this->deviceSettings.samplingFrequencyHz,
-          this->helperClassInstance.fftPtr),
+          this->helperClassInstance.fftPtr);
 
-      .spO2CalculatorPtr = new SpO2Calculator<voltage_data_type>(),
+  this->helperClassInstance.spO2CalculatorPtr =
+      new SpO2Calculator<voltage_data_type>();
 
-      .heartRateCalculatorPtr = new HeartRateCalculator<voltage_data_type>()
-
-  };
+  this->helperClassInstance.heartRateCalculatorPtr =
+      new HeartRateCalculator<voltage_data_type>();
 
   this->helperClassInstance.displayPtr->begin();
 };
@@ -103,7 +110,7 @@ EventController<voltage_data_type, time_data_type,
 template <class voltage_data_type, class time_data_type, class pin_id_data_type>
 EventController<voltage_data_type, time_data_type,
                 pin_id_data_type>::~EventController() {
-  // delete this -> helperClassInstance objects
+  // Delete helperClassInstance objects
   delete this->helperClassInstance.hardwareLayerPtr;
   delete this->helperClassInstance.ppgSignalControllerPtr;
   delete this->helperClassInstance.displayPtr;
@@ -112,7 +119,7 @@ EventController<voltage_data_type, time_data_type,
   delete this->helperClassInstance.spO2CalculatorPtr;
   delete this->helperClassInstance.heartRateCalculatorPtr;
 
-  // delete this->deviceMemory objects
+  // Delete deviceMemory objects
   delete this->deviceMemory.rawRedPPGSignalHistoryPtr;
   delete this->deviceMemory.filteredRedPPGSignalHistoryPtr;
   delete this->deviceMemory.rawInfraRedPPGSignalHistoryPtr;
@@ -131,8 +138,30 @@ void EventController<voltage_data_type, time_data_type,
   // Check for the state of the program
   DeviceState currentState = deviceStatusStructPtr->deviceState;
 
-  // Branch off to check for creating flags for the corresponding action to
-  // take. Input for the current state
+  // Checking the current state
+  this->checkCurrentState(currentState);
+
+  // Performing actions based on the current state
+  this->performStateAction(currentState);
+
+  // Updating the state
+  this->updateStateEventCount(currentState);
+
+  // Calculating the next state
+  DeviceState nextState = this->calculateNextState(currentState);
+}
+
+/**
+ * @brief Checks the current state of the program.
+ *
+ * This method executes different code depending on the current state of the
+ * program.
+ *
+ * @param currentState The current state of the program.
+ */
+template <class voltage_data_type, class time_data_type, class pin_id_data_type>
+void EventController<voltage_data_type, time_data_type, pin_id_data_type>::
+    checkCurrentState(DeviceState currentState) {
   switch (currentState) {
     case RedLedOn:
       // Code to execute when RedLedOn.
@@ -172,66 +201,55 @@ void EventController<voltage_data_type, time_data_type,
       // Code to execute when 'state' is not any of the above cases
       break;
   }
+}
 
-  // Computing for the actions current state.
+/**
+ * @brief Performs actions based on the current state of the program.
+ *
+ * This method executes different code depending on the current state of the
+ * program.
+ *
+ * @param currentState The current state of the program.
+ */
+template <class voltage_data_type, class time_data_type, class pin_id_data_type>
+void EventController<voltage_data_type, time_data_type, pin_id_data_type>::
+    performStateAction(DeviceState currentState) {
   switch (currentState) {
     case RedLedOn:
-      // Code to execute when RedLedOn.
+      // Set the red LED voltage to the maximum output voltage
       this->deviceStatus.redLedVoltage = this->deviceSettings.maxOutputVoltage;
+      // Set the infrared LED voltage to the minimum output voltage
       this->deviceStatus.infraRedLedVoltage =
           this->deviceSettings.minOutputVoltage;
+      // Set the red and infrared LED voltages using the PPG signal controller
+      this->helperClassInstance.ppgSignalControllerPtr->setRedLED(
+          this->deviceStatus.redLedVoltage);
+      this->helperClassInstance.ppgSignalControllerPtr->setInfraRedLED(
+          this->deviceStatus.infraRedLedVoltage);
       break;
     case InfraRedLedOn:
+      // Set the red LED voltage to the minimum output voltage
       this->deviceStatus.redLedVoltage = this->deviceSettings.minOutputVoltage;
+      // Set the infrared LED voltage to the maximum output voltage
       this->deviceStatus.infraRedLedVoltage =
           this->deviceSettings.maxOutputVoltage;
-      break;
-    case PhotoDetectorReading:
-      // Code to execute when PhotoDetectorReading.
-      break;
-    case UiIsUpdating:
-      // Code to execute when UiIsUpdating
-      break;
-    case SignalIsProcessing:
-      // Code to execute when SignalIsProcessing
-      break;
-    case DeviceIdling:
-      // Code to execute when DeviceIdling
-      break;
-    case EventSequenceStarting:
-      // Code to execute when EventSequenceStarting
-      break;
-    case EventSequenceEnding:
-      // Code to execute when EventSequenceEnding
-      break;
-    default:
-      // Code to execute when 'state' is not any of the above cases
-      break;
-  }
-
-  // Performing actions for the current state.
-  switch (currentState) {
-    case RedLedOn:
-      // Code to execute when RedLedOn.
+      // Set the red and infrared LED voltages using the PPG signal controller
       this->helperClassInstance.ppgSignalControllerPtr->setRedLED(
           this->deviceStatus.redLedVoltage);
       this->helperClassInstance.ppgSignalControllerPtr->setInfraRedLED(
           this->deviceStatus.infraRedLedVoltage);
       break;
-    case InfraRedLedOn:
-      // Change the LED status based on above modification
-      this->helperClassInstance.ppgSignalControllerPtr->setRedLED(
-          this->deviceStatus.redLedVoltage);
-      this->helperClassInstance.ppgSignalControllerPtr->setInfraRedLED(
-          this->deviceStatus.infraRedLedVoltage);
     case PhotoDetectorReading:
       // Code to execute when PhotoDetectorReading.
       if (this->deviceStatus.statesCompleted[RedLedOn] >
           this->deviceStatus.statesCompleted[InfraRedLedOn]) {
+        // Put the raw photodiode voltage into the raw red PPG signal history
         this->deviceMemory.rawRedPPGSignalHistoryPtr->put(
             this->deviceMemory.rawPhotodiodeVoltage);
       } else if (this->deviceStatus.statesCompleted[RedLedOn] ==
                  this->deviceStatus.statesCompleted[InfraRedLedOn]) {
+        // Put the raw photodiode voltage into the raw infrared PPG signal
+        // history
         this->deviceMemory.rawInfraRedPPGSignalHistoryPtr->put(
             this->deviceMemory.rawPhotodiodeVoltage);
       } else {
@@ -239,51 +257,74 @@ void EventController<voltage_data_type, time_data_type,
       }
       break;
     case UiIsUpdating:
-      // TODO Code to execute when UiIsUpdating
+      // Code to execute when UiIsUpdating.
+      // Update the SpO2 value on the display
       this->helperClassInstance.displayPtr->updateSpO2(
           this->deviceMemory.spO2Value);
+      // Update the heart beat rate value on the display
       this->helperClassInstance.displayPtr->updateHBR(
           this->deviceMemory.heartBeatRateValue);
-
+      // Update the PPG wave on the display
       this->helperClassInstance.displayPtr->updatePPGWave(
           this->deviceMemory.filteredRedPPGSignalHistoryPtr);
-
       break;
     case SignalIsProcessing:
-      //  TODO Code to execute when SignalIsProcessing
+      // Code to execute when SignalIsProcessing.
+      // Process the raw red PPG signal history using the filter
       this->helperClassInstance.filterPtr->process(
           this->deviceMemory.rawRedPPGSignalHistoryPtr,
           this->deviceMemory.filteredRedPPGSignalHistoryPtr);
+      // Process the raw infrared PPG signal history using the filter
       this->helperClassInstance.filterPtr->process(
           this->deviceMemory.rawInfraRedPPGSignalHistoryPtr,
           this->deviceMemory.filteredInfraRedPPGSignalHistoryPtr);
-      // Calculate the biomedical metrics
+      // Calculate the SpO2 value using the filtered PPG signal histories
       this->deviceMemory.spO2Value =
           this->helperClassInstance.spO2CalculatorPtr->calculate(
               this->deviceMemory.filteredRedPPGSignalHistoryPtr,
               this->deviceMemory.filteredInfraRedPPGSignalHistoryPtr);
+      // Calculate the heart beat rate value using the filtered PPG signal
+      // histories
       this->deviceMemory.heartBeatRateValue =
           this->helperClassInstance.heartRateCalculatorPtr->calculate(
               this->deviceMemory.filteredRedPPGSignalHistoryPtr,
               this->deviceMemory.filteredInfraRedPPGSignalHistoryPtr);
       break;
     case DeviceIdling:
-      // Code to execute when DeviceIdling
+      // Code to execute when DeviceIdling.
+      // No specific code to execute in this state.
       break;
     case EventSequenceStarting:
-      // Code to execute when EventSequenceStarting
-      for (int i = 0; i < DeviceStateTotal; ++i)
+      // Code to execute when EventSequenceStarting.
+      // Reset the statesCompleted array to 0
+      for (int i = 0; i < DeviceStateTotal; ++i) {
         this->deviceStatus.statesCompleted[i] = 0;
+      }
       break;
     case EventSequenceEnding:
-      // Code to execute when EventSequenceEnding
+      // Code to execute when EventSequenceEnding.
+      // No specific code to execute in this state.
       break;
     default:
-      // Code to execute when 'state' is not any of the above cases
+      // Code to execute when 'state' is not any of the above cases.
+      // No specific code to execute for the default case.
       break;
   }
-  ++(this->deviceStatus.statesCompleted[currentState]);
+}
 
+/**
+ * @brief Calculates the next state of the program based on the current state.
+ *
+ * This method determines the next state of the program based on the current
+ * state.
+ *
+ * @param currentState The current state of the program.
+ * @return The next state of the program.
+ */
+template <class voltage_data_type, class time_data_type, class pin_id_data_type>
+DeviceState EventController<
+    voltage_data_type, time_data_type,
+    pin_id_data_type>::calculateNextState(DeviceState currentState) {
   // Calculating and deciding what the next state is.
   DeviceState nextState;
   switch (currentState) {
@@ -316,50 +357,18 @@ void EventController<voltage_data_type, time_data_type,
       // Assert an error
       break;
   }
-  /*
-// Check which LED is on from the class
-bool isRedLedOn = ppgSignalControllerPtr->getRedLED();
-bool isInfraRedLedOn = ppgSignalControllerPtr->getInfraRedLED();
-
-// Change the other LED to be turned on
-if (isRedLedOn) {
-ppgSignalControllerPtr->setInfraRedLED(voltage_data_type());
-} else if (isInfraRedLedOn) {
-ppgSignalControllerPtr->setRedLED(voltage_data_type());
+  return nextState;
 }
 
-// Sample the photodiode voltage after some waiting time for the LED to warm
-// up (200 microseconds)
-voltage_data_type photodiodeVoltage =
-ppgSignalControllerPtr->getPhotoDiodeVoltage(200);
-
-// Store the signal to the corresponding SignalHistory class
-rawRedPPGSignalHistoryPtr->put(photodiodeVoltage);
-
-// Check if the time since the last timestamp was set from 1/60 seconds ago
-if (!((rawRedPPGSignalHistoryPtr->getEntryPointIndex() == 1 / 60))) {
-return;
+/**
+ * @brief Updates the count of events for the current state.
+ *
+ * This method increments the count of events for the current state.
+ *
+ * @param currentState The current state of the program.
+ */
+template <class voltage_data_type, class time_data_type, class pin_id_data_type>
+void EventController<voltage_data_type, time_data_type, pin_id_data_type>::
+    updateStateEventCount(DeviceState currentState) {
+  ++(this->deviceStatus.statesCompleted[currentState]);
 }
-
-// Apply the filter to the signal
-std::vector<voltage_data_type> filteredSignal =
-filterPtr->filter(fftPtr->fastFourierTransform(
-rawRedPPGSignalHistoryPtr->get(nthSample)));
-
-// Update the filteredSignal Class and update to the class method of `Display`
-displayPtr->updatePPGWave(filteredSignal.data(),
-                filteredSignal.size(), min_ppg_value,
-                max_ppg_value);
-
-// Perform heartBeatRate and SP02 computation if there is a new heart beat
-// detected
-voltage_data_type spo2Value =
-spO2CalculatorPtr->calculate(filteredSignal);
-voltage_data_type hrValue =
-heartRateCalculatorPtr->calculate(filteredSignal);
-
-// Update the Display class by passing the HBR, SPO2 filtered SignalPoint
-displayPtr->updateSpO2(spo2Value);
-displayPtr->updateHBR(hrValue);
-*/
-};

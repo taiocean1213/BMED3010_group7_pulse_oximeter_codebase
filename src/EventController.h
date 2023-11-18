@@ -2,6 +2,7 @@
 #define EVENTCONTROLLER_H
 
 #include <map>
+#include <vector>
 
 #include "biomedical_metrics/HeartRateCalculatorInterface.h"
 #include "biomedical_metrics/SpO2CalculatorInterface.h"
@@ -12,6 +13,19 @@
 #include "signal_filter/FilterInterface.h"
 #include "signal_history/SignalHistoryInterface.h"
 #include "user_interface/Displayinterface.h"
+
+typedef enum {
+  RedLedOn,
+  InfraRedLedOn,
+  PhotoDetectorReading,
+  UiIsUpdating,
+  SignalIsProcessing,
+  DeviceIdling,
+  EventSequenceStarting,
+  EventSequenceEnding,
+  DeviceStateTotal
+} DeviceState;
+
 /**
  * @brief EventController class template for handling events.
  *
@@ -25,18 +39,60 @@ template <class voltage_data_type, class time_data_type, class pin_id_data_type>
 class EventController : public EventControllerInterface {
  public:
   /**
+   * @brief Constructor for the EventController class.
+   *
+   * This constructor initializes the HardwareAbstractionLayer,
+   * PPGSignalHardwareController, Display, and SignalHistory classes.
+   */
+  EventController();
+
+  /**
+   * @brief Destructor for the EventController class.
+   *
+   * This destructor deletes the HardwareAbstractionLayer,
+   * PPGSignalHardwareController, Display, and SignalHistory classes.
+   */
+  ~EventController();
+
+  /**
    * @brief LoopOnce method for implementing the logic for the main loop of the
    * event controller.
    */
   void loopOnce() override;
 
-  // Constructors
-  EventController();
-
-  // Destructor
-  ~EventController();
-
  private:
+  /**
+   * @brief Method to check the current state and perform corresponding actions.
+   *
+   * @param currentState The current state of the event controller.
+   */
+  void checkCurrentState(DeviceState currentState);
+
+  /**
+   * @brief Method to perform actions based on the current state.
+   *
+   * @param currentState The current state of the event controller.
+   */
+  void performStateAction(DeviceState currentState);
+
+  /**
+   * @brief Method to calculate the next state based on the current state.
+   *
+   * @param currentState The current state of the event controller.
+   * @return The next state of the event controller.
+   */
+  DeviceState calculateNextState(DeviceState currentState);
+
+  /**
+   * @brief Method to update the event count for the current state.
+   *
+   * @param currentState The current state of the event controller.
+   */
+  void updateStateEventCount(DeviceState currentState);
+
+  /**
+   * @brief Struct to hold instances of helper classes.
+   */
   typedef struct HelperClassInstanceStruct {
     HardwareAbstractionLayerInterface<voltage_data_type, time_data_type,
                                       pin_id_data_type>* hardwareLayerPtr;
@@ -50,19 +106,9 @@ class EventController : public EventControllerInterface {
     HeartRateCalculatorInterface<voltage_data_type>* heartRateCalculatorPtr;
   } helper_class_instance_data_type;
 
-  typedef enum {
-    RedLedOn,
-    InfraRedLedOn,
-    PhotoDetectorReading,
-    UiIsUpdating,
-    SignalIsProcessing,
-    DeviceIdling,
-    EventSequenceStarting,
-    EventSequenceEnding,
-    DeviceStateTotal
-  } DeviceState;
-
-  // Struct members that can be configured for the device.
+  /**
+   * @brief Struct to hold device settings.
+   */
   typedef struct DeviceSettings {
     int analogResolutionValue;
     int baudRate;
@@ -75,7 +121,9 @@ class EventController : public EventControllerInterface {
     voltage_data_type photoDiodeWarmupTimeUs;
   } device_settings_data_type;
 
-  // Struct members that can be actively controlled by the device.
+  /**
+   * @brief Struct to hold device status.
+   */
   typedef struct DeviceStatus {
     voltage_data_type redLedVoltage;
     voltage_data_type infraRedLedVoltage;
@@ -83,7 +131,9 @@ class EventController : public EventControllerInterface {
     int statesCompleted[DeviceStateTotal];
   } device_status_data_type;
 
-  // Struct members that is measured and recorded by the device.
+  /**
+   * @brief Struct to hold device memory.
+   */
   typedef struct DeviceMemory {
     voltage_data_type rawPhotodiodeVoltage;
     time_data_type eventSequenceStartTimeUs;
@@ -105,8 +155,5 @@ class EventController : public EventControllerInterface {
 
 // TODO explicit instantiation required
 template class EventController<double, int, int>;
-
-// using keyword definition
-// using EventControllerDefaultClass = EventController<double, int, int>;
 
 #endif
