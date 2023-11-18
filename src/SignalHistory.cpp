@@ -100,6 +100,17 @@ element_type SignalHistory<element_type>::max() {
 };
 
 /**
+ * @brief Retrieves the number of samples stored for history.
+ *
+ * @return The number of samples stored for history.
+ *
+ */
+template <class element_type>
+element_type SignalHistory<element_type>::size() {
+  return history.size();
+}
+
+/**
  * @brief Resets the history.
  *
  * This function clears the history.

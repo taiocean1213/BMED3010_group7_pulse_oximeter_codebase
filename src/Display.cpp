@@ -90,14 +90,13 @@ void Display<values_data_type>::updatePPGWave(
   const uint16_t BAR_COLOR = ILI9341_WHITE;
 
   // Calculate the width of each bar
-  int bar_width = TFTscreen.width() /
-                  ppgWaveformClassPtr->size();  // FIXME need implementation
+  int bar_width = TFTscreen.width() / ppgWaveformClassPtr->size();
 
   // Calculate the half of the screen height
   int half_screen_height = TFTscreen.height() / 2;
 
   // Loop over each PPG value
-  for (int i = 0; i < num_values; i++) {
+  for (int i = 0; i < ppgWaveformClassPtr->size(); i++) {
     // Map the PPG value to the screen height
     int bar_height =
         map(ppgWaveformClassPtr->get(i), ppgWaveformClassPtr->min(),

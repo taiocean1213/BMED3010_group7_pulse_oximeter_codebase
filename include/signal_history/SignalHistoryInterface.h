@@ -53,6 +53,16 @@ class SignalHistoryInterface {
   virtual element_type max() = 0;
 
   /**
+   * @brief Retrieves the number of samples stored for history.
+   *
+   * @return The number of samples stored for history.
+   *
+   * This is a pure virtual function, it must be overridden in any non-abstract
+   * child class.
+   */
+  virtual element_type size() = 0;
+
+  /**
    * @brief Resets the history.
    *
    * This is a pure virtual function, it must be overridden in any non-abstract

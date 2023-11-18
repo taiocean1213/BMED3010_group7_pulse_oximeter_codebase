@@ -66,6 +66,14 @@ class SignalHistory : public SignalHistoryInterface<element_type> {
   element_type max() override;
 
   /**
+   * @brief Retrieves the number of samples stored for history.
+   *
+   * @return The number of samples stored for history.
+   *
+   */
+  element_type size() override;
+
+  /**
    * @brief Resets the history.
    *
    * This function clears the history.
