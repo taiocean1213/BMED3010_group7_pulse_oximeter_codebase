@@ -85,13 +85,13 @@ void Display<values_data_type>::updateHBR(values_data_type hr_value) {
  */
 template <class values_data_type>
 void Display<values_data_type>::updatePPGWave(
-    SignalHistoryInterface<values_data_type>* ppgWaveformClassPtr){
-    /*
+    SignalHistoryInterface<values_data_type>* ppgWaveformClassPtr) {
   // Define the color for the bars
   const uint16_t BAR_COLOR = ILI9341_WHITE;
 
   // Calculate the width of each bar
-  int bar_width = TFTscreen.width() / num_values;
+  int bar_width = TFTscreen.width() /
+                  ppgWaveformClassPtr->size();  // FIXME need implementation
 
   // Calculate the half of the screen height
   int half_screen_height = TFTscreen.height() / 2;
@@ -100,7 +100,8 @@ void Display<values_data_type>::updatePPGWave(
   for (int i = 0; i < num_values; i++) {
     // Map the PPG value to the screen height
     int bar_height =
-        map(ppg_values[i], min_ppg_value, max_ppg_value, 0, half_screen_height);
+        map(ppgWaveformClassPtr->get(i), ppgWaveformClassPtr->min(),
+            ppgWaveformClassPtr->max(), 0, half_screen_height);
 
     // Ensure the bar height is not negative
     if (bar_height < 0) bar_height = 0;
@@ -110,9 +111,7 @@ void Display<values_data_type>::updatePPGWave(
 
     // Draw the bar on the screen
     TFTscreen.fillRect(i * bar_width, bar_y, bar_width, bar_height, BAR_COLOR);
-
   }
-  */
 };
 /**
  * @brief Clear the display screen
