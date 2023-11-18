@@ -75,16 +75,16 @@ void HardwareAbstractionLayer<voltage_data_type, time_data_type,
  * @brief Waits until a specified time in microseconds.
  *
  * This function uses the Arduino micros() function to pause the execution of
- * the program until tje specified microseconds.
+ * the program until the specified microseconds.
  *
  * @tparam voltage_data_type The type of the voltage data.
  * @tparam time_data_type The type of the time data.
  * @param timeUs The time in microseconds to wait.
  */
 template <class voltage_data_type, class time_data_type, class pin_id_data_type>
-time_data_type HardwareAbstractionLayer<
-    voltage_data_type, time_data_type,
-    pin_id_data_type>::waitUntilTimeUs(time_data_type timeUs) {
+void HardwareAbstractionLayer<voltage_data_type, time_data_type,
+                              pin_id_data_type>::waitUntilTimeUs(time_data_type
+                                                                     timeUs) {
   /**
    * @brief Gets the current time in microseconds and stores it in startTime.
    */

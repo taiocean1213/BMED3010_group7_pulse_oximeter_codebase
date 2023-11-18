@@ -35,7 +35,7 @@ class HardwareAbstractionLayer
   time_data_type getCurrentTimeUs() override;
 
   /**
-   * @brief Configures a pin t either output or input mode.
+   * @brief Configures a pin to either output or input mode.
    * @param outputPinId The ID of the pin that needs to be configured.
    * @param outputIsTrue The boolean value that set the pin
    * as output if argument is `true`, and input when `false` is passed.
@@ -46,7 +46,7 @@ class HardwareAbstractionLayer
    * @brief Waits until a specified time in microseconds.
    * @param timeUs The time in microseconds until to return.
    */
-  time_data_type waitUntilTimeUs(time_data_type) override;
+  void waitUntilTimeUs(time_data_type) override;
 
   // TODO(taiocean1213):
   // void setEventAtTimeUs(time_data_type, void*(void)) override;
