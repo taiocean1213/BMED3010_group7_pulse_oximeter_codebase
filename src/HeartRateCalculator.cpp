@@ -7,14 +7,18 @@
 
 #include "HeartRateCalculator.h"
 
+/**
+ * @brief Calculates the heart rate.
+ * @param redIrSignalPtr A vector of floats representing the data collected
+ * when the red LED is on.
+ * @param infraRedIrSignalPtr A vector of floats representing the data
+ * collected when the infraRed LED is on.
+ * @return The calculated Heart beat rate.
+ */
 template <class element_type>
 element_type HeartRateCalculator<element_type>::calculate(
-    SignalHistoryInterface<element_type>* dataPtr) {
-  /**
-   * @brief Calculates the heart rate.
-   * @param data A vector of integers representing the heart rate data.
-   * @return The calculated heart rate.
-   */
+    SignalHistoryInterface<element_type>* redIrSignalPtr,
+    SignalHistoryInterface<element_type>* infraRedIrSignalPtr) {
   element_type sum = 0;
   /*
   for (element_type value : dataPtr) {

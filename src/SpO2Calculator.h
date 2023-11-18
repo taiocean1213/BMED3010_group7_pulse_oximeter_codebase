@@ -18,11 +18,15 @@ class SpO2Calculator : public SpO2CalculatorInterface<element_type> {
  public:
   /**
    * @brief Calculates the SpO2.
-   * @param data A vector of floats representing the SpO2 data.
+   * @param redIrSignalPtr A vector of floats representing the data collected
+   * when the red LED is on.
+   * @param infraRedIrSignalPtr A vector of floats representing the data
+   * collected when the infraRed LED is on.
    * @return The calculated SpO2.
    */
   element_type calculate(
-      SignalHistoryInterface<element_type>* dataPtr) override;
+      SignalHistoryInterface<element_type>* redIrSignalPtr,
+      SignalHistoryInterface<element_type>* infraRedIrSignalPtr) override;
 };
 
 #endif

@@ -18,11 +18,15 @@ class HeartRateCalculator : public HeartRateCalculatorInterface<element_type> {
  public:
   /**
    * @brief Calculates the heart rate.
-   * @param data A vector of integers representing the heart rate data.
-   * @return The calculated heart rate.
+   * @param redIrSignalPtr A vector of floats representing the data collected
+   * when the red LED is on.
+   * @param infraRedIrSignalPtr A vector of floats representing the data
+   * collected when the infraRed LED is on.
+   * @return The calculated Heart beat rate.
    */
   element_type calculate(
-      SignalHistoryInterface<element_type>* dataPtr) override;
+      SignalHistoryInterface<element_type>* redIrSignalPtr,
+      SignalHistoryInterface<element_type>* infraRedIrSignalPtr) override;
 };
 
 #endif
