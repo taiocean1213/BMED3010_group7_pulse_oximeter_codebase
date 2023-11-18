@@ -1,5 +1,6 @@
 #ifndef DISPLAYINTERFACE_H
 #define DISPLAYINTERFACE_H
+#include "signal_history/SignalHistoryInterface.h"
 
 /**
  * @interface DisplayInterface
@@ -35,14 +36,11 @@ class DisplayInterface {
   /**
    * @brief Update the PPG waveform on the display
    * @tparam values_data_type The data type of the PPG values
-   * @param ppg_values An array of PPG values
-   * @param num_values The number of PPG values in the array
-   * @param min_ppg_value The minimum PPG value
-   * @param max_ppg_value The maximum PPG value
+   * @param ppgWaveformClassPtr The pointerto the `SignalHistoryInterface`
+   * template class containing the PPG waveform
    */
-  virtual void updatePPGWave(values_data_type ppg_values[], int num_values,
-                             values_data_type min_ppg_value,
-                             values_data_type max_ppg_value) = 0;
+  virtual void updatePPGWave(
+      SignalHistoryInterface<values_data_type>* ppgWaveformClassPtr) = 0;
 
   /**
    * @brief Clear the display screen

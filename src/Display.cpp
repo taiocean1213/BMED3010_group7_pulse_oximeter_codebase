@@ -84,10 +84,9 @@ void Display<values_data_type>::updateHBR(values_data_type hr_value) {
  * @param max_ppg_value The maximum PPG value
  */
 template <class values_data_type>
-void Display<values_data_type>::updatePPGWave(values_data_type ppg_values[],
-                                              int num_values,
-                                              values_data_type min_ppg_value,
-                                              values_data_type max_ppg_value) {
+void Display<values_data_type>::updatePPGWave(
+    SignalHistoryInterface<values_data_type>* ppgWaveformClassPtr){
+    /*
   // Define the color for the bars
   const uint16_t BAR_COLOR = ILI9341_WHITE;
 
@@ -111,7 +110,9 @@ void Display<values_data_type>::updatePPGWave(values_data_type ppg_values[],
 
     // Draw the bar on the screen
     TFTscreen.fillRect(i * bar_width, bar_y, bar_width, bar_height, BAR_COLOR);
+
   }
+  */
 };
 /**
  * @brief Clear the display screen

@@ -240,15 +240,14 @@ void EventController<voltage_data_type, time_data_type,
       break;
     case UiIsUpdating:
       // TODO Code to execute when UiIsUpdating
-      /*
       this->helperClassInstance.displayPtr->updateSpO2(
-          values_data_type spo2_value);
+          this->deviceMemory.spO2Value);
       this->helperClassInstance.displayPtr->updateHBR(
-          values_data_type spo2_value);
+          this->deviceMemory.heartBeatRateValue);
+
       this->helperClassInstance.displayPtr->updatePPGWave(
-          values_data_type ppg_values[], int num_values,
-          values_data_type min_ppg_value, values_data_type max_ppg_value);
-      */
+          this->deviceMemory.filteredRedPPGSignalHistoryPtr);
+
       break;
     case SignalIsProcessing:
       //  TODO Code to execute when SignalIsProcessing
@@ -286,6 +285,7 @@ void EventController<voltage_data_type, time_data_type,
   ++(this->deviceStatus.statesCompleted[currentState]);
 
   // Calculating and deciding what the next state is.
+  DeviceState nextState;
   switch (currentState) {
     case RedLedOn:
       // Code to execute when RedLedOn.
@@ -313,6 +313,7 @@ void EventController<voltage_data_type, time_data_type,
       break;
     default:
       // Code to execute when 'state' is not any of the above cases
+      // Assert an error
       break;
   }
   /*

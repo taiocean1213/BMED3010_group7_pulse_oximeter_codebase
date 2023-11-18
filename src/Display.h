@@ -9,6 +9,7 @@
 #undef abs
 #include <Adafruit_ILI9341.h>
 
+#include "SignalHistory.h"
 #include "user_interface/Displayinterface.h"
 
 /**
@@ -45,14 +46,11 @@ class Display : public DisplayInterface<values_data_type> {
   /**
    * @brief Update the PPG waveform on the display
    * @tparam values_data_type The data type of the PPG values
-   * @param ppg_values An array of PPG values
-   * @param num_values The number of PPG values in the array
-   * @param min_ppg_value The minimum PPG value
-   * @param max_ppg_value The maximum PPG value
+   * @param ppgWaveformClassPtr The pointerto the `SignalHistoryInterface`
+   * template class containing the PPG waveform
    */
-  void updatePPGWave(values_data_type ppg_values[], int num_values,
-                     values_data_type min_ppg_value,
-                     values_data_type max_ppg_value) override;
+  void updatePPGWave(
+      SignalHistoryInterface<values_data_type>* ppgWaveformClassPtr) override;
 
   /**
    * @brief Clear the display screen

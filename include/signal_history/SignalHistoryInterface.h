@@ -10,6 +10,7 @@
 template <class element_type>
 class SignalHistoryInterface {
  public:
+  virtual ~SignalHistoryInterface() {}
   /**
    * @brief Adds a signal to the history.
    *

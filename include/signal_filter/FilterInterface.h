@@ -15,6 +15,7 @@
 template <typename element_data_type, typename frequency_datatype>
 class FilterInterface {
  public:
+  virtual ~FilterInterface() {}
   /**
    * @brief Apply the filter to the given data based on the configuration set by
    * the arguments passed to the constructor.

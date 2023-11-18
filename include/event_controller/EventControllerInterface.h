@@ -7,6 +7,7 @@
 #define EVENTCONTROLLERINTERFACE_H
 class EventControllerInterface {
  public:
+  virtual ~EventControllerInterface() {}
   virtual void loopOnce() = 0;
 };
 #endif

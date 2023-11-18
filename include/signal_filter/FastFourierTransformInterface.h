@@ -13,6 +13,7 @@
 template <typename element_datatype>
 class FastFourierTransformInterface {
  public:
+  virtual ~FastFourierTransformInterface() {}
   /**
    * @brief Performs the Fast Fourier Transform operation on the input data.
    * @param input The input data vector.
