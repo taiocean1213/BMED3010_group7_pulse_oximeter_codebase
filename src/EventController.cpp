@@ -54,6 +54,9 @@ EventController<voltage_data_type, time_data_type,
       .filteredInfraRedPPGSignalHistoryPtr =
           new SignalHistory<voltage_data_type>(
               this->deviceSettings.signalHistoryElementsCount),
+
+      .spO2Value = 0,
+      .heartBeatRateValue = 0,
   };
   this->deviceMemory.rawRedPPGSignalHistoryPtr->reset();
   this->deviceMemory.filteredRedPPGSignalHistoryPtr->reset();
@@ -249,12 +252,21 @@ void EventController<voltage_data_type, time_data_type,
       break;
     case SignalIsProcessing:
       //  TODO Code to execute when SignalIsProcessing
-      /*
-      this->deviceMemory.filteredRedPPGSignalHistoryPtr =
-          &this->helperClassInstance.filterPtr->process();
-      this->deviceMemory.filteredInfraRedPPGSignalHistoryPtr =
-          &this->helperClassInstance.filterPtr->process();
-      */
+      this->helperClassInstance.filterPtr->process(
+          this->deviceMemory.rawRedPPGSignalHistoryPtr,
+          this->deviceMemory.filteredRedPPGSignalHistoryPtr);
+      this->helperClassInstance.filterPtr->process(
+          this->deviceMemory.rawInfraRedPPGSignalHistoryPtr,
+          this->deviceMemory.filteredInfraRedPPGSignalHistoryPtr);
+      // Calculate the biomedical metrics
+      this->deviceMemory.spO2Value =
+          this->helperClassInstance.spO2CalculatorPtr->calculate(
+              this->deviceMemory.filteredRedPPGSignalHistoryPtr,
+              this->deviceMemory.filteredInfraRedPPGSignalHistoryPtr);
+      this->deviceMemory.heartBeatRateValue =
+          this->helperClassInstance.heartRateCalculatorPtr->calculate(
+              this->deviceMemory.filteredRedPPGSignalHistoryPtr,
+              this->deviceMemory.filteredInfraRedPPGSignalHistoryPtr);
       break;
     case DeviceIdling:
       // Code to execute when DeviceIdling

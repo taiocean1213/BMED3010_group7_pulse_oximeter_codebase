@@ -93,6 +93,8 @@ class EventController : public EventControllerInterface {
     SignalHistoryInterface<voltage_data_type>* rawInfraRedPPGSignalHistoryPtr;
     SignalHistoryInterface<voltage_data_type>*
         filteredInfraRedPPGSignalHistoryPtr;
+    voltage_data_type spO2Value;
+    voltage_data_type heartBeatRateValue;
   } device_memory_data_type;
 
   helper_class_instance_data_type helperClassInstance;
