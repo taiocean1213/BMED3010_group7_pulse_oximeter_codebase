@@ -1,5 +1,7 @@
 #include <unity.h>
 
+#define ISPPGCODETEST 1
+
 #include "FastFourierTransform.h"
 
 void setUp(void) {
