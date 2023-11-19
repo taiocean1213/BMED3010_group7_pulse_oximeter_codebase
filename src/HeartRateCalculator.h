@@ -28,5 +28,7 @@ class HeartRateCalculator : public HeartRateCalculatorInterface<element_type> {
       SignalHistoryInterface<element_type>* redIrSignalPtr,
       SignalHistoryInterface<element_type>* infraRedIrSignalPtr) override;
 };
+// Explicit instantiation
+template class HeartRateCalculator<double>;
 
 #endif

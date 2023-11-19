@@ -2,18 +2,20 @@
 #undef Min
 #undef Max
 #undef abs
-#undef min //for muting the `Arduino.h` in-built min() function
-#undef max //for muting the `Arduino.h` in-built max() function
+#undef min  // for muting the `Arduino.h` in-built min() function
+#undef max  // for muting the `Arduino.h` in-built max() function
 
-#include "Display.h"
-#include "HardwareAbstractionLayer.h"
-#include "HeartRateCalculator.h"
-#include "PPGSignalHardwareController.h"
-#include "SignalHistory.h"
-#include "SpO2Calculator.h"
+#include "EventController.h"
 
-void setup() {}
+// Declare class in heap.
+EventController<double, int, int> eventControllerClassObject;
+
+void setup() {
+  // Initialize the EventController Class in the heap
+  eventControllerClassObject = EventController<double, int, int>();
+}
 
 void loop() {
   // put your main code here, to run repeatedly:
+  eventControllerClassObject.loopOnce();
 }

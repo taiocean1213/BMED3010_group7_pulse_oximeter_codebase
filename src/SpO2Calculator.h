@@ -29,4 +29,7 @@ class SpO2Calculator : public SpO2CalculatorInterface<element_type> {
       SignalHistoryInterface<element_type>* infraRedIrSignalPtr) override;
 };
 
+// Explicit instantiation
+template class SpO2Calculator<double>;
+
 #endif
