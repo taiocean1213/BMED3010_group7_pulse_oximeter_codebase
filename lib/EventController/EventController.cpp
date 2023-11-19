@@ -28,9 +28,10 @@ EventController<voltage_data_type, time_data_type,
                      .maxOutputVoltage = 3.3,
                      .passbandsHz = {{1, 2}, {3, 4}},
                      .stopbandsHz = {{5, 6}, {7, 8}},
-                     .samplingFrequencyHz = 40,
+                     .samplingPeriodUs = 1000000 / 40,
                      .signalHistoryElementsCount = 50,
-                     .photoDiodeWarmupTimeUs = 200},
+                     .photoDiodeWarmupTimeUs = 200,
+                     .screenRefreshTimeIntervalUs = 1000000 / 30},
       deviceStatus{
           .redLedVoltage = 0, .infraRedLedVoltage = 0, .deviceState = RedLedOn},
       helperClassInstance{.hardwareLayerPtr = nullptr,
@@ -43,32 +44,6 @@ EventController<voltage_data_type, time_data_type,
   // Initialize all statesCompleted to 0
   for (int i = 0; i < DeviceStateTotal; ++i)
     this->deviceStatus.statesCompleted[i] = 0;
-
-  // Initialize deviceMemory
-  this->deviceMemory = {
-      .rawPhotodiodeVoltage = 0,
-      .eventSequenceStartTimeUs = 0,
-      .eventSequenceEndTimeUs = 0,
-      .lastDisplayUpdateTime = 0,
-      .lastFilteredSignalUpdateTime = 0,
-      .rawRedPPGSignalHistoryPtr = new SignalHistory<voltage_data_type>(
-          this->deviceSettings.signalHistoryElementsCount),
-      .filteredRedPPGSignalHistoryPtr = new SignalHistory<voltage_data_type>(
-          this->deviceSettings.signalHistoryElementsCount),
-      .rawInfraRedPPGSignalHistoryPtr = new SignalHistory<voltage_data_type>(
-          this->deviceSettings.signalHistoryElementsCount),
-      .filteredInfraRedPPGSignalHistoryPtr =
-          new SignalHistory<voltage_data_type>(
-              this->deviceSettings.signalHistoryElementsCount),
-      .spO2Value = 0,
-      .heartBeatRateValue = 0,
-  };
-
-  // Reset all signal histories
-  this->deviceMemory.rawRedPPGSignalHistoryPtr->reset();
-  this->deviceMemory.filteredRedPPGSignalHistoryPtr->reset();
-  this->deviceMemory.rawInfraRedPPGSignalHistoryPtr->reset();
-  this->deviceMemory.filteredInfraRedPPGSignalHistoryPtr->reset();
 
   // Initialize helperClassInstance objects
   this->helperClassInstance.hardwareLayerPtr =
@@ -91,7 +66,7 @@ EventController<voltage_data_type, time_data_type,
   this->helperClassInstance.filterPtr =
       new Filter<voltage_data_type, voltage_data_type>(
           this->deviceSettings.passbandsHz, this->deviceSettings.stopbandsHz,
-          this->deviceSettings.samplingFrequencyHz,
+          this->deviceSettings.samplingPeriodUs,
           this->helperClassInstance.fftPtr);
 
   this->helperClassInstance.spO2CalculatorPtr =
@@ -101,6 +76,35 @@ EventController<voltage_data_type, time_data_type,
       new HeartRateCalculator<voltage_data_type>();
 
   this->helperClassInstance.displayPtr->begin();
+
+  // Initialize deviceMemory
+  this->deviceMemory = {
+      .rawPhotodiodeVoltage = 0,
+      .eventSequenceStartTimeUs =
+          this->helperClassInstance.ppgSignalControllerPtr->getCurrentTimeUs(),
+      .eventSequenceEndTimeUs =
+          this->helperClassInstance.ppgSignalControllerPtr->getCurrentTimeUs() +
+          this->deviceSettings.screenRefreshTimeIntervalUs,
+      .lastDisplayUpdateTime = 0,
+      .lastFilteredSignalUpdateTime = 0,
+      .rawRedPPGSignalHistoryPtr = new SignalHistory<voltage_data_type>(
+          this->deviceSettings.signalHistoryElementsCount),
+      .filteredRedPPGSignalHistoryPtr = new SignalHistory<voltage_data_type>(
+          this->deviceSettings.signalHistoryElementsCount),
+      .rawInfraRedPPGSignalHistoryPtr = new SignalHistory<voltage_data_type>(
+          this->deviceSettings.signalHistoryElementsCount),
+      .filteredInfraRedPPGSignalHistoryPtr =
+          new SignalHistory<voltage_data_type>(
+              this->deviceSettings.signalHistoryElementsCount),
+      .spO2Value = 0,
+      .heartBeatRateValue = 0,
+  };
+
+  // Reset all signal histories
+  this->deviceMemory.rawRedPPGSignalHistoryPtr->reset();
+  this->deviceMemory.filteredRedPPGSignalHistoryPtr->reset();
+  this->deviceMemory.rawInfraRedPPGSignalHistoryPtr->reset();
+  this->deviceMemory.filteredInfraRedPPGSignalHistoryPtr->reset();
 };
 
 /**
@@ -183,9 +187,13 @@ void EventController<voltage_data_type, time_data_type, pin_id_data_type>::
       break;
     case UiIsUpdating:
       // Code to execute when UiIsUpdating
+      this->deviceMemory.lastDisplayUpdateTime =
+          this->helperClassInstance.ppgSignalControllerPtr->getCurrentTimeUs();
       break;
     case SignalIsProcessing:
       // Code to execute when SignalIsProcessing
+      this->deviceMemory.lastFilteredSignalUpdateTime =
+          this->helperClassInstance.ppgSignalControllerPtr->getCurrentTimeUs();
       break;
     case DeviceIdling:
       // Code to execute when DeviceIdling
@@ -298,6 +306,12 @@ void EventController<voltage_data_type, time_data_type, pin_id_data_type>::
     case DeviceIdling:
       // Code to execute when DeviceIdling.
       // No specific code to execute in this state.
+      while ((this->helperClassInstance.ppgSignalControllerPtr
+                  ->getCurrentTimeUs() -
+              this->deviceMemory.eventSequenceStartTimeUs) <=
+             this->deviceSettings.samplingPeriodUs) {
+        continue;
+      }
       break;
     case EventSequenceStarting:
       // Code to execute when EventSequenceStarting.
@@ -333,9 +347,6 @@ DeviceState EventController<
   // Calculating and deciding what the next state is.
   DeviceState nextState;
 
-  // Get the current time of the program
-  time_data_type timeNowUs =
-      this->helperClassInstance.ppgSignalControllerPtr->getCurrentTimeUs();
   switch (currentState) {
     case RedLedOn:
       // Transition to the next state after RedLedOn.
@@ -346,15 +357,23 @@ DeviceState EventController<
       nextState = PhotoDetectorReading;
       break;
     case PhotoDetectorReading:
+
       // Transition to the next state after PhotoDetectorReading.
-      if (true) { /*TODO branch off based on last update time*/
-        nextState = UiIsUpdating;
-      } else if (true) {
+      if ((this->helperClassInstance.ppgSignalControllerPtr
+               ->getCurrentTimeUs() -
+           this->deviceMemory.lastFilteredSignalUpdateTime) >=
+          this->deviceSettings.screenRefreshTimeIntervalUs) {
         nextState = SignalIsProcessing;
+      } else if ((this->helperClassInstance.ppgSignalControllerPtr
+                      ->getCurrentTimeUs() -
+                  this->deviceMemory.lastDisplayUpdateTime) >=
+                 this->deviceSettings.screenRefreshTimeIntervalUs) {
+        nextState = UiIsUpdating;
       } else {
         nextState = DeviceIdling;
       }
       break;
+
     case UiIsUpdating:
       // Transition to the next state after UiIsUpdating.
       nextState = DeviceIdling;

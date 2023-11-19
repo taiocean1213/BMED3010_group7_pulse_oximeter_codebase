@@ -116,9 +116,10 @@ class EventController : public EventControllerInterface {
     voltage_data_type maxOutputVoltage;
     std::vector<std::pair<voltage_data_type, voltage_data_type>> passbandsHz;
     std::vector<std::pair<voltage_data_type, voltage_data_type>> stopbandsHz;
-    voltage_data_type samplingFrequencyHz;
+    voltage_data_type samplingPeriodUs;
     voltage_data_type signalHistoryElementsCount;
     voltage_data_type photoDiodeWarmupTimeUs;
+    time_data_type screenRefreshTimeIntervalUs;
   } device_settings_data_type;
 
   /**
