@@ -27,7 +27,8 @@ class HeartRateCalculator : public HeartRateCalculatorInterface<element_type> {
    */
   element_type calculate(
       SignalHistoryInterface<element_type>* redSignalHistoryPtr,
-      SignalHistoryInterface<element_type>* infraRedSignalHistoryPtr) override;
+      SignalHistoryInterface<element_type>* infraRedSignalHistoryPtr,
+      element_type samplingPeriodUs) override;
 
  private:
   /**

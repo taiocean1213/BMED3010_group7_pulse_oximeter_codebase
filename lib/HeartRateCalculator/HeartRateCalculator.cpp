@@ -11,7 +11,8 @@
 template <class element_type>
 element_type HeartRateCalculator<element_type>::calculate(
     SignalHistoryInterface<element_type>* redSignalHistoryPtr,
-    SignalHistoryInterface<element_type>* infraRedSignalHistoryPtr) {
+    SignalHistoryInterface<element_type>* infraRedSignalHistoryPtr,
+    element_type samplingPeriodUs) {
   // Calculate the maximum and minimum values in the PPG signal history
   element_type maxValue =
       getMaxValue(redSignalHistoryPtr);  // Get the maximum value from the red
@@ -26,9 +27,6 @@ element_type HeartRateCalculator<element_type>::calculate(
       minValue, maxValue,
       percentage);  // Calculate the threshold for the rising edge detection
 
-  // Calculate the number of rising edges per second in the PPG signal history
-  element_type samplingPeriodUs =
-      1000000;  // This value can be adjusted as needed
   element_type heartRate = countRisingEdgesPerMinute(
       redSignalHistoryPtr, threshold,
       samplingPeriodUs);  // Count the number of rising edges per minute in the

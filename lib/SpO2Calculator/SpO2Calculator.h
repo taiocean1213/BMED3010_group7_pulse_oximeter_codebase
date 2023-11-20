@@ -27,7 +27,8 @@ class SpO2Calculator : public SpO2CalculatorInterface<element_type> {
    */
   element_type calculate(
       SignalHistoryInterface<element_type>* redIrSignalPtr,
-      SignalHistoryInterface<element_type>* infraRedIrSignalPtr) override;
+      SignalHistoryInterface<element_type>* infraRedIrSignalPtr,
+      element_type samplingPeriodUs) override;
 
  private:
   /**

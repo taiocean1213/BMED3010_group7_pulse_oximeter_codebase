@@ -15,7 +15,8 @@ template <class element_type>
 class CalculationModuleInterface {
  public:
   virtual element_type calculate(SignalHistoryInterface<element_type>*,
-                                 SignalHistoryInterface<element_type>*) = 0;
+                                 SignalHistoryInterface<element_type>*,
+                                 element_type) = 0;
 };
 
 #endif

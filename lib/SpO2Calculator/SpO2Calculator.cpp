@@ -15,7 +15,8 @@
 template <class element_type>
 element_type SpO2Calculator<element_type>::calculate(
     SignalHistoryInterface<element_type>* redInfraredSignalPtr,
-    SignalHistoryInterface<element_type>* infraredSignalPtr) {
+    SignalHistoryInterface<element_type>* infraredSignalPtr,
+    element_type samplingPeriodUs) {
   // Get the data from the signal history objects
   std::vector<element_type> redData;
   std::vector<element_type> infraredData;

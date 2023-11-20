@@ -295,13 +295,15 @@ void EventController<voltage_data_type, time_data_type, pin_id_data_type>::
       this->deviceMemory.spO2Value =
           this->helperClassInstance.spO2CalculatorPtr->calculate(
               this->deviceMemory.filteredRedPPGSignalHistoryPtr,
-              this->deviceMemory.filteredInfraRedPPGSignalHistoryPtr);
+              this->deviceMemory.filteredInfraRedPPGSignalHistoryPtr,
+              this->deviceSettings.samplingPeriodUs);
       // Calculate the heart beat rate value using the filtered PPG signal
       // histories
       this->deviceMemory.heartBeatRateValue =
           this->helperClassInstance.heartRateCalculatorPtr->calculate(
               this->deviceMemory.filteredRedPPGSignalHistoryPtr,
-              this->deviceMemory.filteredInfraRedPPGSignalHistoryPtr);
+              this->deviceMemory.filteredInfraRedPPGSignalHistoryPtr,
+              this->deviceSettings.samplingPeriodUs);
       break;
     case DeviceIdling:
       // Code to execute when DeviceIdling.
