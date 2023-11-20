@@ -10,6 +10,7 @@
  * @param redInfraredSignalPtr Pointer to the signal history for red and
  * infrared signals.
  * @param infraredSignalPtr Pointer to the signal history for infrared signals.
+ * @param samplingPeriodUs The sampling period in microseconds.
  * @return The calculated SpO2 value.
  */
 template <class element_type>
@@ -17,19 +18,9 @@ element_type SpO2Calculator<element_type>::calculate(
     SignalHistoryInterface<element_type>* redInfraredSignalPtr,
     SignalHistoryInterface<element_type>* infraredSignalPtr,
     element_type samplingPeriodUs) {
-  // Get the data from the signal history objects
-  std::vector<element_type> redData;
-  std::vector<element_type> infraredData;
-
-  // Populate the redData and infraredData vectors with data from the signal
-  // history objects
-  for (element_type i = 0; i < redInfraredSignalPtr->size(); i++) {
-    redData.push_back(redInfraredSignalPtr->get(i));
-    infraredData.push_back(infraredSignalPtr->get(i));
-  }
-
   // Calculate the R value
-  element_type RValue = calculateRValue(redData, infraredData);
+  element_type RValue =
+      calculateRValue(redInfraredSignalPtr, infraredSignalPtr);
 
   // Calculate the SpO2
   element_type result = findSpO2Value(RValue);
@@ -43,35 +34,44 @@ element_type SpO2Calculator<element_type>::calculate(
 
 /**
  * @brief Calculate the R value from the given red and infrared values.
- * @param redValues Vector of red values.
- * @param infraredValues Vector of infrared values.
+ * @param redInfraredSignalPtr Pointer to the signal history for red and
+ * infrared signals.
+ * @param infraredSignalPtr Pointer to the signal history for infrared signals.
  * @return The calculated R value.
  */
 template <class element_type>
 element_type SpO2Calculator<element_type>::calculateRValue(
-    std::vector<element_type>& redValues,
-    std::vector<element_type>& infraredValues) {
+    SignalHistoryInterface<element_type>* redInfraredSignalPtr,
+    SignalHistoryInterface<element_type>* infraredSignalPtr) {
   // Define the literal
   const element_type DEFAULTINITIALVALUE = 0;
 
-  // Calculate the sum of red values
-  element_type sumRed =
-      std::accumulate(redValues.begin(), redValues.end(), DEFAULTINITIALVALUE);
-  // Calculate the sum of infrared values
-  element_type sumInfrared = std::accumulate(
-      infraredValues.begin(), infraredValues.end(), DEFAULTINITIALVALUE);
+  // declare the variables
+  element_type sumOfRedSignals = DEFAULTINITIALVALUE;
+  element_type sumOfInfraRedSignals = DEFAULTINITIALVALUE;
+
+  // Populate the redData and infraredData vectors with data from the signal
+  // history objects
+  for (element_type i = 0; i < redInfraredSignalPtr->size(); i++) {
+    sumOfRedSignals += redInfraredSignalPtr->get(i);
+    sumOfInfraRedSignals += infraredSignalPtr->get(i);
+  }
 
   // Calculate the DC component for red and infrared values
-  element_type redDC = sumRed / redValues.size();
-  element_type infraredDC = sumInfrared / infraredValues.size();
+  element_type redSignalAverage =
+      sumOfRedSignals / redInfraredSignalPtr->size();
+  element_type rinfraRedSignalAverage =
+      sumOfInfraRedSignals / infraredSignalPtr->size();
 
   // Calculate the ACrms for red and infrared values
-  element_type redACrms = findACComponentRootMeanSquare(redValues, redDC);
+  element_type redACrms =
+      rootMeanSquare(redInfraredSignalPtr, redSignalAverage);
   element_type infraredACrms =
-      findACComponentRootMeanSquare(infraredValues, infraredDC);
+      rootMeanSquare(infraredSignalPtr, rinfraRedSignalAverage);
 
   // Calculate the R value
-  return (redACrms / redDC) / (infraredACrms / infraredDC);
+  return (redACrms / redSignalAverage) /
+         (infraredACrms / rinfraRedSignalAverage);
 };
 
 /**
@@ -107,27 +107,27 @@ element_type SpO2Calculator<element_type>::findSpO2Value(element_type RValue) {
 /**
  * @brief Calculate the root mean square of the AC component from the given
  * values and DC component.
- * @param values Vector of values.
- * @param DCOffset The DC component.
+ * @param ppgSignalHistoryObjectPtr Pointer to the signal history object.
+ * @param signalOffset The DC component of the signal.
  * @return The calculated root mean square of the AC component.
  */
 template <class element_type>
-element_type SpO2Calculator<element_type>::findACComponentRootMeanSquare(
-    std::vector<element_type>& values, element_type DCOffset) {
+element_type SpO2Calculator<element_type>::rootMeanSquare(
+    SignalHistoryInterface<element_type>* ppgSignalHistoryObjectPtr,
+    element_type signalOffset) {
   // Define the literal
   const element_type DEFAULTINITIALVALUE = 0;
 
-  // Calculate the AC component by subtracting the DC component from each value
-  std::vector<element_type> ACComponent;
-  for (element_type value : values) {
-    ACComponent.push_back(value - DCOffset);
+  element_type sum = DEFAULTINITIALVALUE;
+  element_type elementCountInHistoryObjectPtr =
+      ppgSignalHistoryObjectPtr->size();
+
+  for (size_t i = DEFAULTINITIALVALUE; i < elementCountInHistoryObjectPtr;
+       i++) {
+    element_type offsetted_element =
+        ppgSignalHistoryObjectPtr->get(i) - signalOffset;
+    sum += offsetted_element * offsetted_element;
   }
 
-  // Calculate the sum of the AC component
-  float sumAC = std::accumulate(ACComponent.begin(), ACComponent.end(),
-                                DEFAULTINITIALVALUE);
-  // Calculate the root mean square of the AC component
-  element_type acrms = sqrt(sumAC / ACComponent.size());
-
-  return acrms;
+  return std::sqrt(sum / elementCountInHistoryObjectPtr);
 };

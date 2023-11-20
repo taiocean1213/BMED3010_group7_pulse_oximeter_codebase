@@ -23,6 +23,7 @@ class SpO2Calculator : public SpO2CalculatorInterface<element_type> {
    * when the red LED is on.
    * @param infraRedIrSignalPtr A vector of floats representing the data
    * collected when the infraRed LED is on.
+   * @param samplingPeriodUs The sampling period in microseconds.
    * @return The calculated SpO2.
    */
   element_type calculate(
@@ -34,12 +35,15 @@ class SpO2Calculator : public SpO2CalculatorInterface<element_type> {
   /**
    * @brief Calculates the R value from the signal history.
    *
-   * @param redValues The red signal values.
-   * @param irValues The infrared signal values.
+   * @param redInfraredSignalPtr Pointer to the signal history for red and
+   * infrared signals.
+   * @param infraredSignalPtr Pointer to the signal history for infrared
+   * signals.
    * @return The calculated R value.
    */
-  element_type calculateRValue(std::vector<element_type>& redValues,
-                               std::vector<element_type>& irValues);
+  element_type calculateRValue(
+      SignalHistoryInterface<element_type>* redInfraredSignalPtr,
+      SignalHistoryInterface<element_type>* infraredSignalPtr);
 
   /**
    * @brief Calculates the SpO2 from the R value.
@@ -52,12 +56,13 @@ class SpO2Calculator : public SpO2CalculatorInterface<element_type> {
   /**
    * @brief Calculates the root mean square of the AC component of the signals.
    *
-   * @param values The signal values.
-   * @param dc The DC component of the signals.
+   * @param ppgSignalHistoryObjectPtr Pointer to the signal history object.
+   * @param signalOffset The DC component of the signals.
    * @return The calculated ACrms.
    */
-  element_type findACComponentRootMeanSquare(std::vector<element_type>& values,
-                                             element_type DCOffset);
+  element_type rootMeanSquare(
+      SignalHistoryInterface<element_type>* ppgSignalHistoryObjectPtr,
+      element_type signalOffset);
 };
 
 // Explicit instantiation
