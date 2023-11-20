@@ -1,8 +1,6 @@
 #ifndef HEARTRATECALCULATOR_H
 #define HEARTRATECALCULATOR_H
 
-#include <vector>
-
 #include "biomedical_metrics/HeartRateCalculatorInterface.h"
 #include "signal_history/SignalHistoryInterface.h"
 
