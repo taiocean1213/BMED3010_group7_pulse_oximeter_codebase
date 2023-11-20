@@ -31,7 +31,7 @@ EventController<voltage_data_type, time_data_type,
                      .samplingPeriodUs = 1000000 / 40,
                      .signalHistoryElementsCount = 50,
                      .photoDiodeWarmupTimeUs = 200,
-                     .screenRefreshTimeIntervalUs = 1000000 / 30},
+                     .screenRefreshTimeIntervalUs = 1000000 / 2},
       deviceStatus{
           .redLedVoltage = 0, .infraRedLedVoltage = 0, .deviceState = RedLedOn},
       helperClassInstance{.hardwareLayerPtr = nullptr,
@@ -317,6 +317,11 @@ void EventController<voltage_data_type, time_data_type, pin_id_data_type>::
       break;
     case EventSequenceStarting:
       // Code to execute when EventSequenceStarting.
+
+      if (this->deviceStatus.statesCompleted[RedLedOn] !=
+          this->deviceStatus.statesCompleted[InfraRedLedOn])
+        break;
+
       // Reset the statesCompleted array to 0
       for (int i = 0; i < DeviceStateTotal; ++i) {
         this->deviceStatus.statesCompleted[i] = 0;

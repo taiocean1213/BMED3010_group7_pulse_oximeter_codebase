@@ -206,13 +206,13 @@ void HardwareAbstractionLayer<
             pow(2.0, (double)(this->analogResolutionValue)) /
             (this->maxOutputVoltage - this->minOutputVoltage));
 
-  if (outputVoltage_double == this->maxOutputVoltage) {
-    digitalWrite(outputPinId, HIGH);
+  if (outputVoltage_double == this->minOutputVoltage) {
+    digitalWrite(outputPinId, LOW);
     return;
   }
 
-  if (outputVoltage_double == this->minOutputVoltage) {
-    digitalWrite(outputPinId, LOW);
+  if (outputVoltage_double == this->maxOutputVoltage) {
+    digitalWrite(outputPinId, HIGH);
     return;
   }
 
