@@ -25,10 +25,6 @@ element_type SpO2Calculator<element_type>::calculate(
   // Calculate the SpO2
   element_type result = findSpO2Value(RValue);
 
-  // Reset the history
-  redInfraredSignalPtr->reset();
-  infraredSignalPtr->reset();
-
   return result;
 };
 
