@@ -12,10 +12,12 @@
  * and stopbands.
  *
  * @tparam element_data_type The data type of the input data elements.
- * @tparam frequency_datatype The data type of the frequency values.
+ * @tparam signal_period_datatype The data type of the time period values in
+ * microseconds.
  */
-template <typename element_data_type, typename frequency_datatype>
-class Filter : public FilterInterface<element_data_type, frequency_datatype> {
+template <typename element_data_type, typename signal_period_datatype>
+class Filter
+    : public FilterInterface<element_data_type, signal_period_datatype> {
  public:
   /**
    * @brief Constructor of the Filter class.
@@ -25,13 +27,13 @@ class Filter : public FilterInterface<element_data_type, frequency_datatype> {
    *
    * @param passbands The vector of pairs representing the passbands.
    * @param stopbands The vector of pairs representing the stopbands.
-   * @param samplingFrequency The sampling frequency of the signal.
+   * @param samplingPeriodUs The sampling period of the signal in microseconds.
    * @param fft The instance of the FastFourierTransformInterface.
    */
   Filter(
       std::vector<std::pair<element_data_type, element_data_type>>& passbands,
       std::vector<std::pair<element_data_type, element_data_type>>& stopbands,
-      element_data_type samplingFrequency,
+      element_data_type samplingPeriodUs,
       FastFourierTransformInterface<element_data_type>* fftClassInstance);
 
   /**
@@ -47,9 +49,22 @@ class Filter : public FilterInterface<element_data_type, frequency_datatype> {
 
  private:
   FastFourierTransformInterface<element_data_type>*
-      fftClassInstance;  //!< The FastFourierTransformInterface instance.
+      fftClassInstancePtr;  //!< The FastFourierTransformInterface instance.
+
+  element_data_type samplingPeriodUs;
+  std::vector<std::pair<element_data_type, element_data_type>> passbands;
+  std::vector<std::pair<element_data_type, element_data_type>> stopbands;
+
+  bool isInPassband(
+      element_data_type frequency,
+      const std::vector<std::pair<element_data_type, element_data_type>>&
+          passbands);
+  bool isInStopband(
+      element_data_type frequency,
+      const std::vector<std::pair<element_data_type, element_data_type>>&
+          stopbands);
 };
 
-template class Filter<double, double>;
+template class Filter<double, int>;
 
 #endif

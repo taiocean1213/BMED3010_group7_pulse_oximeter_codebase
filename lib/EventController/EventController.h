@@ -101,7 +101,7 @@ class EventController : public EventControllerInterface {
         ppgSignalControllerPtr;
     DisplayInterface<voltage_data_type>* displayPtr;
     FastFourierTransformInterface<voltage_data_type>* fftPtr;
-    FilterInterface<voltage_data_type, voltage_data_type>* filterPtr;
+    FilterInterface<voltage_data_type, time_data_type>* filterPtr;
     SpO2CalculatorInterface<voltage_data_type>* spO2CalculatorPtr;
     HeartRateCalculatorInterface<voltage_data_type>* heartRateCalculatorPtr;
   } helper_class_instance_data_type;

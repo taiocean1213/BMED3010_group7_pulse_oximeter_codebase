@@ -21,26 +21,40 @@ class FastFourierTransform
  public:
   /**
    * @brief Performs the Fast Fourier Transform operation on the input data.
-   * @param input The input data vector.
-   * @return The result of the Fast Fourier Transform operation.
+   * @param realInput The input data vector for real part.
+   * @param imaginaryInput The input data vector for imaginary part.
+   * @param realOutput The output data vector for real part.
+   * @param imaginaryOutput The output data vector for imaginary part.
    */
-  std::vector<element_datatype> fastFourierTransform(
-      const std::vector<element_datatype> realInput,
-      const std::vector<element_datatype> imaginaryInput,
-      element_datatype sampleSize) override;
+
+  void fastFourierTransform(
+      const std::vector<element_datatype>* realInput,
+      const std::vector<element_datatype>* imaginaryInput,
+      std::vector<element_datatype>* realOutput,
+      std::vector<element_datatype>* imaginaryOutput) override;
 
   /**
    * @brief Performs the Inverse Fast Fourier Transform operation on the input
    * data.
-   * @param input The input data vector.
-   * @return The result of the Inverse Fast Fourier Transform operation.
+   * @param realInput The input data vector for real part.
+   * @param imaginaryInput The input data vector for imaginary part.
+   * @param realOutput The output data vector for real part.
+   * @param imaginaryOutput The output data vector for imaginary part.
+   * @param sampleSize The sample size of the input data.
    */
-  std::vector<element_datatype> inverseFastFourierTransform(
-      const std::vector<element_datatype> realInput,
-      const std::vector<element_datatype> imaginaryInput,
-      element_datatype sampleSize) override;
+
+  void inverseFastFourierTransform(
+      const std::vector<element_datatype>* realInput,
+      const std::vector<element_datatype>* imaginaryInput,
+      std::vector<element_datatype>* realOutput,
+      std::vector<element_datatype>* imaginaryOutput) override;
 
  private:
+  /**
+   * @brief A static function to perform FFT on the input data.
+   * @param a The input data vector.
+   * @param invert A boolean indicating whether to perform FFT or inverse FFT.
+   */
   static void fft(std::vector<cd>& a, bool invert);
 };
 

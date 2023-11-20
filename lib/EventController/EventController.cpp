@@ -64,7 +64,7 @@ EventController<voltage_data_type, time_data_type,
       new FastFourierTransform<voltage_data_type>();
 
   this->helperClassInstance.filterPtr =
-      new Filter<voltage_data_type, voltage_data_type>(
+      new Filter<voltage_data_type, time_data_type>(
           this->deviceSettings.passbandsHz, this->deviceSettings.stopbandsHz,
           this->deviceSettings.samplingPeriodUs,
           this->helperClassInstance.fftPtr);

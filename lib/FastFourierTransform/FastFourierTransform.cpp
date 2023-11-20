@@ -1,4 +1,3 @@
-// FastFourierTransform.cpp
 #include "FastFourierTransform.h"
 
 #include <cmath>
@@ -6,25 +5,32 @@
 #include <vector>
 
 using cd = std::complex<double>;
-const double PI = std::acos(-1);
 
-// https://cp-algorithms.com/algebra/fft.html#improved-implementation-in-place-computation
+/**
+ * @brief A static function to perform FFT on the input data.
+ * Modified from from
+ * https://cp-algorithms.com/algebra/fft.html#improved-implementation-in-place-computation
+ *
+ * @param a The input data vector.
+ * @param invert A boolean indicating whether to perform FFT or inverse FFT.
+ */
 template <typename element_datatype>
 void FastFourierTransform<element_datatype>::fft(std::vector<cd>& a,
                                                  bool invert) {
-  int n = a.size();
-  for (int i = 1, j = 0; i < n; i++) {
-    int bit = n >> 1;
+  const element_datatype PI = std::acos(-1);
+  size_t n = a.size();
+  for (size_t i = 1, j = 0; i < n; i++) {
+    size_t bit = n % 2;  // changed
     for (; j & bit; bit >>= 1) j ^= bit;
     j ^= bit;
     if (i < j) std::swap(a[i], a[j]);
   }
-  for (int len = 2; len <= n; len <<= 1) {
-    double ang = 2 * PI / len * (invert ? -1 : 1);
+  for (size_t len = 2; len <= n; len <<= 1) {
+    element_datatype ang = 2 * PI / len * (invert ? -1 : 1);
     cd wlen(cos(ang), sin(ang));
-    for (int i = 0; i < n; i += len) {
+    for (size_t i = 0; i < n; i += len) {
       cd w(1);
-      for (int j = 0; j < len / 2; j++) {
+      for (size_t j = 0; j < len / 2; j++) {
         cd u = a[i + j], v = a[i + j + len / 2] * w;
         a[i + j] = u + v;
         a[i + j + len / 2] = u - v;
@@ -35,40 +41,58 @@ void FastFourierTransform<element_datatype>::fft(std::vector<cd>& a,
   if (invert) {
     for (cd& x : a) x /= n;
   }
-};
-// https://cp-algorithms.com/algebra/fft.html#improved-implementation-in-place-computation
+}
+
+/**
+ * @brief Performs the Inverse Fast Fourier Transform operation on the input
+ * data. Modified from
+ * https://cp-algorithms.com/algebra/fft.html#improved-implementation-in-place-computation
+ *
+ * @param realInput The input data vector for real part.
+ * @param imaginaryInput The input data vector for imaginary part.
+ * @param realOutput The output data vector for real part.
+ * @param imaginaryOutput The output data vector for imaginary part.
+ */
 template <typename element_datatype>
-std::vector<element_datatype>
-FastFourierTransform<element_datatype>::fastFourierTransform(
-    const std::vector<element_datatype> realInput,
-    const std::vector<element_datatype> imaginaryInput,
-    element_datatype sampleSize) {
-  std::vector<cd> input(sampleSize);
-  for (int i = 0; i < sampleSize; i++) {
-    input[i] = cd(realInput[i], imaginaryInput[i]);
+void FastFourierTransform<element_datatype>::fastFourierTransform(
+    const std::vector<element_datatype>* realInput,
+    const std::vector<element_datatype>* imaginaryInput,
+    std::vector<element_datatype>* realOutput,
+    std::vector<element_datatype>* imaginaryOutput) {
+  std::vector<cd> input(realInput->size());
+  for (size_t i = 0; i < realInput->size(); i++) {
+    input[i] = cd((*realInput)[i], (*imaginaryInput)[i]);
   }
   fft(input, false);
-  std::vector<element_datatype> result(sampleSize);
-  for (int i = 0; i < sampleSize; i++) {
-    result[i] = input[i].real();
+  for (size_t i = 0; i < realInput->size(); i++) {
+    (*realOutput)[i] = input[i].real();
+    (*imaginaryOutput)[i] = input[i].imag();
   }
-  return result;
-};
-// https://cp-algorithms.com/algebra/fft.html#improved-implementation-in-place-computation
+}
+
+/**
+ * @brief Performs the Inverse Fast Fourier Transform operation on the input
+ * data. Modified from
+ * https://cp-algorithms.com/algebra/fft.html#improved-implementation-in-place-computation
+ *
+ * @param realInput The input data vector for real part.
+ * @param imaginaryInput The input data vector for imaginary part.
+ * @param realOutput The output data vector for real part.
+ * @param imaginaryOutput The output data vector for imaginary part.
+ */
 template <typename element_datatype>
-std::vector<element_datatype>
-FastFourierTransform<element_datatype>::inverseFastFourierTransform(
-    const std::vector<element_datatype> realInput,
-    const std::vector<element_datatype> imaginaryInput,
-    element_datatype sampleSize) {
-  std::vector<cd> input(sampleSize);
-  for (int i = 0; i < sampleSize; i++) {
-    input[i] = cd(realInput[i], imaginaryInput[i]);
+void FastFourierTransform<element_datatype>::inverseFastFourierTransform(
+    const std::vector<element_datatype>* realInput,
+    const std::vector<element_datatype>* imaginaryInput,
+    std::vector<element_datatype>* realOutput,
+    std::vector<element_datatype>* imaginaryOutput) {
+  std::vector<cd> input(realInput->size());
+  for (size_t i = 0; i < realInput->size(); i++) {
+    input[i] = cd((*realInput)[i], (*imaginaryInput)[i]);
   }
   fft(input, true);
-  std::vector<element_datatype> result(sampleSize);
-  for (int i = 0; i < sampleSize; i++) {
-    result[i] = input[i].real() / sampleSize;
+  for (size_t i = 0; i < realInput->size(); i++) {
+    (*realOutput)[i] = input[i].real() / realInput->size();
+    (*imaginaryOutput)[i] = input[i].imag() / realInput->size();
   }
-  return result;
-};
+}
