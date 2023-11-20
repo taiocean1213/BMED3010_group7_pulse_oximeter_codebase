@@ -41,7 +41,10 @@
         "streambuf": "cpp",
         "cinttypes": "cpp",
         "typeinfo": "cpp",
-        "map": "cpp"
+        "map": "cpp",
+        "functional": "cpp",
+        "iterator": "cpp",
+        "numeric": "cpp"
     },
     "cmake.configureOnOpen": true,
     "C_Cpp.clang_format_fallbackStyle": "Google",
