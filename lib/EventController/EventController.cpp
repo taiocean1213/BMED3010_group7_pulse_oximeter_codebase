@@ -214,7 +214,8 @@ void EventController<voltage_data_type, time_data_type, pin_id_data_type>::
     case SignalIsProcessing:
       // Code to execute when SignalIsProcessing
       this->deviceMemory.lastFilteredSignalUpdateTime =
-          this->helperClassInstance.ppgSignalControllerPtr->getCurrentTimeUs();
+          this->helperClassInstance.ppgSignalControllerPtr->getCurrentTimeUs() +
+          this->deviceSettings.screenRefreshTimeIntervalUs / 2;
       break;
     case DeviceIdling:
       // Code to execute when DeviceIdling
@@ -301,6 +302,7 @@ void EventController<voltage_data_type, time_data_type, pin_id_data_type>::
       // Update the PPG wave on the display
       this->helperClassInstance.displayPtr->updatePPGWave(
           this->deviceMemory.filteredRedPPGSignalHistoryPtr);
+      Serial.println("UI is updating");
       break;
     case SignalIsProcessing:
       // Code to execute when SignalIsProcessing.
