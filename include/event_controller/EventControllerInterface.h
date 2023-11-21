@@ -5,6 +5,8 @@
  * This interface defines the contract for classes that need to implement a
  * loopOnce method.
  */
+#include "HardwareAbstractionLayer/HardwareAbstractionLayer.h"
+
 #ifndef EVENTCONTROLLERINTERFACE_H
 #define EVENTCONTROLLERINTERFACE_H
 class EventControllerInterface {
@@ -16,6 +18,14 @@ class EventControllerInterface {
    * class is called.
    */
   virtual ~EventControllerInterface() {}
+
+  /**
+   * @brief setup for the EventController class.
+   *
+   * This setup method initializes the HardwareAbstractionLayer,
+   * PPGSignalHardwareController, Display, and SignalHistory classes.
+   */
+  virtual void setup() = 0;
 
   /**
    * @brief Pure virtual function to be implemented by derived classes.

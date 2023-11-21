@@ -10,8 +10,8 @@
 #include "hardware_driver_apis/HardwareAbstractionLayerInterface.h"
 
 #define PHOTODIODE_PIN A0
-#define RED_SIGNAL_PIN DAC0
-#define INFRARED_SIGNAL_PIN DAC1
+#define RED_SIGNAL_PIN 6
+#define INFRARED_SIGNAL_PIN 5
 
 /**
  * @class PPGSignalHardwareController
@@ -23,12 +23,15 @@
  * LEDs, and get the voltage of the photo diode.
  */
 template <class voltage_data_type, class time_data_type, class pin_id_data_type>
-PPGSignalHardwareController<voltage_data_type, time_data_type,
-                            pin_id_data_type>::
-    PPGSignalHardwareController(
-        HardwareAbstractionLayerInterface<voltage_data_type, time_data_type,
-                                          pin_id_data_type>* hardwareLayer)
-    : hardwareLayer(hardwareLayer) {}
+void PPGSignalHardwareController<voltage_data_type, time_data_type,
+                                 pin_id_data_type>::
+    setup(HardwareAbstractionLayerInterface<voltage_data_type, time_data_type,
+                                            pin_id_data_type>* hardwareLayer) {
+  this->hardwareLayer = hardwareLayer;
+  this->hardwareLayer->setPinMode(PHOTODIODE_PIN, false);
+  this->hardwareLayer->setPinMode(RED_SIGNAL_PIN, true);
+  this->hardwareLayer->setPinMode(INFRARED_SIGNAL_PIN, true);
+}
 
 /**
  * @brief Gets the current time in microseconds.

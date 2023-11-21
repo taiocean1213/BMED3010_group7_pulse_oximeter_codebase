@@ -1,4 +1,5 @@
 #include <Arduino.h>
+
 #undef Min
 #undef Max
 #undef abs
@@ -8,14 +9,15 @@
 #include "EventController.h"
 
 // Declare class in heap.
-EventController<double, int, int> eventControllerClassObject;
+EventController<double, int, int>* eventControllerClassObject;
 
 void setup() {
   // Initialize the EventController Class in the heap
-  eventControllerClassObject = EventController<double, int, int>();
+  eventControllerClassObject = new EventController<double, int, int>();
+  eventControllerClassObject->setup();
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  eventControllerClassObject.loopOnce();
+  eventControllerClassObject->loopOnce();
 }

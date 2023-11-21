@@ -9,7 +9,7 @@
 #undef max  // for muting the `Arduino.h` in-built max() function
 
 /**
- * @brief Constructors that configures the hardware input and output
+ * @brief setups that configures the hardware input and output
  *
  * @param analogResolutionValue The number of quantized level is
  * set to `2 ^ (analogResolutionValue)`.
@@ -20,8 +20,9 @@
  * @tparam time_data_type The type of the time data.
  */
 template <class voltage_data_type, class time_data_type, class pin_id_data_type>
-HardwareAbstractionLayer<voltage_data_type, time_data_type, pin_id_data_type>::
-    HardwareAbstractionLayer(int analogResolutionValue, int baudRate,
+void HardwareAbstractionLayer<
+    voltage_data_type, time_data_type,
+    pin_id_data_type>::setup(int analogResolutionValue, int baudRate,
                              voltage_data_type minOutputVoltage,
                              voltage_data_type maxOutputVoltage) {
   this->analogResolutionValue = analogResolutionValue;
@@ -69,6 +70,15 @@ void HardwareAbstractionLayer<voltage_data_type, time_data_type,
   // if outputIsTrue == true, the set pin with outputPinId
   // as OUTPUT, else set it to input
   pinMode(outputPinId, outputIsTrue ? OUTPUT : INPUT);
+  digitalWrite(outputPinId, LOW);
+  delay(500);
+  digitalWrite(outputPinId, HIGH);
+  delay(500);
+  digitalWrite(outputPinId, LOW);
+  delay(500);
+  digitalWrite(outputPinId, HIGH);
+  delay(500);
+  digitalWrite(outputPinId, LOW);
 };
 
 /**
@@ -197,6 +207,21 @@ void HardwareAbstractionLayer<
     voltage_data_type, time_data_type,
     pin_id_data_type>::writeVoltage(pin_id_data_type outputPinId,
                                     voltage_data_type outputVoltage) {
+  Serial.println("Hardware Abstraction Layer writeVoltage() method invoked.");
+
+  Serial.print(outputPinId);
+
+  if (outputVoltage == this->minOutputVoltage) {
+    Serial.println("th-pin LED voltage set to low.");
+    digitalWrite(outputPinId, LOW);
+    return;
+  }
+
+  if (outputVoltage == this->maxOutputVoltage) {
+    Serial.println("th-pin LED voltage set to high.");
+    digitalWrite(outputPinId, HIGH);
+    return;
+  }
   // Convert the output voltage to the quantized level
   // The formula is derived from the information in
   // https://link.springer.com/chapter/10.1007/978-3-030-88439-0_7
@@ -205,16 +230,6 @@ void HardwareAbstractionLayer<
       (int)((outputVoltage_double - this->minOutputVoltage) *
             pow(2.0, (double)(this->analogResolutionValue)) /
             (this->maxOutputVoltage - this->minOutputVoltage));
-
-  if (outputVoltage_double == this->minOutputVoltage) {
-    digitalWrite(outputPinId, LOW);
-    return;
-  }
-
-  if (outputVoltage_double == this->maxOutputVoltage) {
-    digitalWrite(outputPinId, HIGH);
-    return;
-  }
 
   // Output the quantized level to the specified pin
   analogWrite(outputPinId, quantized_level);

@@ -16,16 +16,16 @@ class HardwareAbstractionLayer
           voltage_data_type, time_data_type, pin_id_data_type> {
  public:
   /**
-   * @brief Constructors that configures the hardware input and output
+   * @brief setup that configures the hardware input and output
    *
    * @param analogResolutionValue The number of quantized level is
    * set to `2 ^ (analogResolutionValue)`.
    * @param baudRate The baud rate that is set for communication via
    * the serial port.
    */
-  HardwareAbstractionLayer(int analogResolutionValue, int baudRate,
-                           voltage_data_type minOutputVoltage,
-                           voltage_data_type maxOutputVoltage);
+  void setup(int analogResolutionValue, int baudRate,
+             voltage_data_type minOutputVoltage,
+             voltage_data_type maxOutputVoltage) override;
 
   /**
    * @brief Gets the current time in microseconds.

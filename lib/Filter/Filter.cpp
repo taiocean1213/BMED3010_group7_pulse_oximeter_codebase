@@ -82,6 +82,23 @@ void Filter<element_data_type, signal_period_datatype>::process(
   for (const auto& sample : realOutputInverse) {
     filterOutputPtr->put(sample);
   }
+
+  // Free all the memory
+  realInput.clear();
+  imaginaryInput.clear();
+  realOutput.clear();
+  imaginaryOutput.clear();
+  realOutputInverse.clear();
+  imaginaryOutputInverse.clear();
+
+  realInput.shrink_to_fit();
+  imaginaryInput.shrink_to_fit();
+  realOutput.shrink_to_fit();
+  imaginaryOutput.shrink_to_fit();
+  realOutputInverse.shrink_to_fit();
+  imaginaryOutputInverse.shrink_to_fit();
+
+  return;
 }
 
 /**

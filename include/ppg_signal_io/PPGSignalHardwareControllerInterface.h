@@ -9,6 +9,9 @@
 template <class voltage_data_type, class time_data_type, class pin_id_data_type>
 class PPGSignalHardwareControllerInterface {
  public:
+  virtual void setup(
+      HardwareAbstractionLayerInterface<voltage_data_type, time_data_type,
+                                        pin_id_data_type>* hardwareLayer);
   virtual ~PPGSignalHardwareControllerInterface() {}
   virtual time_data_type getCurrentTimeUs();
   virtual void setRedLED(voltage_data_type ledVoltage);

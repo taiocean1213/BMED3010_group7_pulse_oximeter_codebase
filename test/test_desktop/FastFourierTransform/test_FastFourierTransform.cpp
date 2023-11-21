@@ -33,6 +33,13 @@ void test_inverseFastFourierTransform(void) {
   std::vector<float> result =
       fft.inverseFastFourierTransform(realInput, imaginaryInput, sampleSize);
 
+  realInput.clear();
+  imaginaryInput.clear();
+  result.clear();
+  realInput.shrink_to_fit();
+  imaginaryInput.shrink_to_fit();
+  result.shrink_to_fit();
+
   // Add your assertion here
 }
 

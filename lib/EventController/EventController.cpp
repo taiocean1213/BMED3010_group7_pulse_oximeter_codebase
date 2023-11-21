@@ -1,8 +1,5 @@
 #include "EventController.h"
 
-#include <map>
-#include <vector>
-
 #include "Display.h"
 #include "EventController.h"
 #include "FastFourierTransform.h"
@@ -16,31 +13,40 @@
 /**
  * @brief Constructor for the EventController class.
  *
- * This constructor initializes the HardwareAbstractionLayer,
- * PPGSignalHardwareController, Display, and SignalHistory classes.
  */
 template <class voltage_data_type, class time_data_type, class pin_id_data_type>
 EventController<voltage_data_type, time_data_type,
-                pin_id_data_type>::EventController()
-    : deviceSettings{.analogResolutionValue = 12,
-                     .baudRate = 38400,
-                     .minOutputVoltage = 0,
-                     .maxOutputVoltage = 3.3,
-                     .passbandsHz = {{1, 2}, {3, 4}},
-                     .stopbandsHz = {{5, 6}, {7, 8}},
-                     .samplingPeriodUs = 1000000 / 40,
-                     .signalHistoryElementsCount = 50,
-                     .photoDiodeWarmupTimeUs = 200,
-                     .screenRefreshTimeIntervalUs = 1000000 / 2},
-      deviceStatus{
-          .redLedVoltage = 0, .infraRedLedVoltage = 0, .deviceState = RedLedOn},
-      helperClassInstance{.hardwareLayerPtr = nullptr,
-                          .ppgSignalControllerPtr = nullptr,
-                          .displayPtr = nullptr,
-                          .fftPtr = nullptr,
-                          .filterPtr = nullptr,
-                          .spO2CalculatorPtr = nullptr,
-                          .heartRateCalculatorPtr = nullptr} {
+                pin_id_data_type>::EventController() {}
+
+/**
+ * @brief setup for the EventController class.
+ *
+ * This setup method initializes the HardwareAbstractionLayer,
+ * PPGSignalHardwareController, Display, and SignalHistory classes.
+ */
+template <class voltage_data_type, class time_data_type, class pin_id_data_type>
+void EventController<voltage_data_type, time_data_type,
+                     pin_id_data_type>::setup() {
+  this->deviceSettings = {.analogResolutionValue = 12,
+                          .baudRate = 38400,
+                          .minOutputVoltage = 0,
+                          .maxOutputVoltage = 3.3,
+                          .passbandsHz = {{1, 2}, {3, 4}},
+                          .stopbandsHz = {{5, 6}, {7, 8}},
+                          .samplingPeriodUs = 1000000 / 40,
+                          .signalHistoryElementsCount = 50,
+                          .photoDiodeWarmupTimeUs = 200,
+                          .screenRefreshTimeIntervalUs = 1000000 / 2};
+  this->deviceStatus = {
+      .redLedVoltage = 0, .infraRedLedVoltage = 0, .deviceState = RedLedOn};
+  this->helperClassInstance = {.hardwareLayerPtr = nullptr,
+                               .ppgSignalControllerPtr = nullptr,
+                               .displayPtr = nullptr,
+                               .fftPtr = nullptr,
+                               .filterPtr = nullptr,
+                               .spO2CalculatorPtr = nullptr,
+                               .heartRateCalculatorPtr = nullptr};
+
   // Initialize all statesCompleted to 0
   for (int i = 0; i < DeviceStateTotal; ++i)
     this->deviceStatus.statesCompleted[i] = 0;
@@ -48,15 +54,19 @@ EventController<voltage_data_type, time_data_type,
   // Initialize helperClassInstance objects
   this->helperClassInstance.hardwareLayerPtr =
       new HardwareAbstractionLayer<voltage_data_type, time_data_type,
-                                   pin_id_data_type>(
-          this->deviceSettings.analogResolutionValue,
-          this->deviceSettings.baudRate, this->deviceSettings.minOutputVoltage,
-          this->deviceSettings.maxOutputVoltage);
+                                   pin_id_data_type>();
+
+  this->helperClassInstance.hardwareLayerPtr->setup(
+      this->deviceSettings.analogResolutionValue, this->deviceSettings.baudRate,
+      this->deviceSettings.minOutputVoltage,
+      this->deviceSettings.maxOutputVoltage);
 
   this->helperClassInstance.ppgSignalControllerPtr =
       new PPGSignalHardwareController<voltage_data_type, time_data_type,
-                                      pin_id_data_type>(
-          this->helperClassInstance.hardwareLayerPtr);
+                                      pin_id_data_type>();
+
+  this->helperClassInstance.ppgSignalControllerPtr->setup(
+      this->helperClassInstance.hardwareLayerPtr);
 
   this->helperClassInstance.displayPtr = new Display<voltage_data_type>();
 
@@ -105,6 +115,17 @@ EventController<voltage_data_type, time_data_type,
   this->deviceMemory.filteredRedPPGSignalHistoryPtr->reset();
   this->deviceMemory.rawInfraRedPPGSignalHistoryPtr->reset();
   this->deviceMemory.filteredInfraRedPPGSignalHistoryPtr->reset();
+
+  /*Serial.begin(38400);
+  while (true) {
+
+    ppgSignalControllerPtr->setRedLED(
+        this->deviceSettings.maxOutputVoltage);
+    this->helperClassInstance.ppgSignalControllerPtr->setRedLED(
+        this->deviceSettings.minOutputVoltage);
+
+    Serial.println("successfully intitlized.");
+  }*/
 };
 
 /**
@@ -395,10 +416,15 @@ DeviceState EventController<
       break;
     case EventSequenceStarting:
       // Transition to the next state after EventSequenceStarting.
-      if (true) { /*TODO branch off based on last update time*/
+      // Code to execute when PhotoDetectorReading.
+      if (this->deviceStatus.statesCompleted[RedLedOn] >
+          this->deviceStatus.statesCompleted[InfraRedLedOn]) {
+        nextState = InfraRedLedOn;
+      } else if (this->deviceStatus.statesCompleted[RedLedOn] ==
+                 this->deviceStatus.statesCompleted[InfraRedLedOn]) {
         nextState = RedLedOn;
       } else {
-        nextState = InfraRedLedOn;
+        // assert an error.
       }
       break;
     case EventSequenceEnding:

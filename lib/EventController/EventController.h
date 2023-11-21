@@ -55,6 +55,14 @@ class EventController : public EventControllerInterface {
   ~EventController();
 
   /**
+   * @brief setup for the EventController class.
+   *
+   * This setup method initializes the HardwareAbstractionLayer,
+   * PPGSignalHardwareController, Display, and SignalHistory classes.
+   */
+  void setup() override;
+
+  /**
    * @brief LoopOnce method for implementing the logic for the main loop of the
    * event controller.
    */

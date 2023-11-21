@@ -22,6 +22,18 @@ class HardwareAbstractionLayerInterface {
   virtual ~HardwareAbstractionLayerInterface() {}
 
   /**
+   * @brief setup that configures the hardware input and output
+   *
+   * @param analogResolutionValue The number of quantized level is
+   * set to `2 ^ (analogResolutionValue)`.
+   * @param baudRate The baud rate that is set for communication via
+   * the serial port.
+   */
+  virtual void setup(int analogResolutionValue, int baudRate,
+                     voltage_data_type minOutputVoltage,
+                     voltage_data_type maxOutputVoltage) = 0;
+
+  /**
    * @brief Gets the current time in microseconds.
    * @return The current time in microseconds.
    */

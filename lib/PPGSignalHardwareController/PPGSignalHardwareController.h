@@ -30,12 +30,12 @@ class PPGSignalHardwareController
 
  public:
   /**
-   * @brief Constructor of the PPGSignalHardwareController class.
+   * @brief setup of the PPGSignalHardwareController class.
    *
    * @param hardwareLayer Pointer to the HardwareAbstractionLayerInterface
    * object.
    */
-  PPGSignalHardwareController(
+  void setup(
       HardwareAbstractionLayerInterface<voltage_data_type, time_data_type,
                                         pin_id_data_type>* hardwareLayer);
 
