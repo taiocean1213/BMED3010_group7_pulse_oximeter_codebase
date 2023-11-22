@@ -1,5 +1,7 @@
 #include "Display.h"
 
+#ifndef EXCLUDEADAFRUITGFXLIB
+
 // Include the Adafruit GFX library for drawing graphics
 #include <Adafruit_GFX.h>
 #undef min
@@ -11,11 +13,13 @@
 // display
 #include <Adafruit_ILI9341.h>
 
+#endif
+
 // Define the Chip Select (CS), Data/Command (DC), and Reset (RST) pins for the
 // ILI9341 TFT display
 #define _cs 10
-#define _dc 9
-#define _rst 8
+#define _dc 8
+#define _rst 9
 
 /**
  * @brief Constructor for the Display class
