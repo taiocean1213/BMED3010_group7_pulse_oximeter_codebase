@@ -136,21 +136,21 @@ void EventController<voltage_data_type, time_data_type,
  */
 template <class voltage_data_type, class time_data_type, class pin_id_data_type>
 EventController<voltage_data_type, time_data_type,
-                pin_id_data_type>::~EventController() {
-  // Delete helperClassInstance objects
-  delete this->helperClassInstance.hardwareLayerPtr;
-  delete this->helperClassInstance.ppgSignalControllerPtr;
-  delete this->helperClassInstance.displayPtr;
-  delete this->helperClassInstance.fftPtr;
-  delete this->helperClassInstance.filterPtr;
-  delete this->helperClassInstance.spO2CalculatorPtr;
-  delete this->helperClassInstance.heartRateCalculatorPtr;
+                pin_id_data_type>::~EventController(){
+    // Delete helperClassInstance objects
+    // delete this->helperClassInstance.hardwareLayerPtr;
+    // delete this->helperClassInstance.ppgSignalControllerPtr;
+    // delete this->helperClassInstance.displayPtr;
+    // delete this->helperClassInstance.fftPtr;
+    // delete this->helperClassInstance.filterPtr;
+    // delete this->helperClassInstance.spO2CalculatorPtr;
+    // delete this->helperClassInstance.heartRateCalculatorPtr;
 
-  // Delete deviceMemory objects
-  delete this->deviceMemory.rawRedPPGSignalHistoryPtr;
-  delete this->deviceMemory.filteredRedPPGSignalHistoryPtr;
-  delete this->deviceMemory.rawInfraRedPPGSignalHistoryPtr;
-  delete this->deviceMemory.filteredInfraRedPPGSignalHistoryPtr;
+    // // Delete deviceMemory objects
+    // delete this->deviceMemory.rawRedPPGSignalHistoryPtr;
+    // delete this->deviceMemory.filteredRedPPGSignalHistoryPtr;
+    // delete this->deviceMemory.rawInfraRedPPGSignalHistoryPtr;
+    // delete this->deviceMemory.filteredInfraRedPPGSignalHistoryPtr;
 };
 
 /**

@@ -6,6 +6,11 @@
 #include "signal_history/SignalHistoryInterface.h"
 
 /**
+ * @brief Class instance destructor.
+ */
+template <class element_type>
+SpO2Calculator<element_type>::~SpO2Calculator() {}
+/**
  * @brief Calculate SpO2 from the given signal histories.
  * @param redInfraredSignalPtr Pointer to the signal history for red and
  * infrared signals.

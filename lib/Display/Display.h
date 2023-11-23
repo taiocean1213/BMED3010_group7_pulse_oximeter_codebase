@@ -1,6 +1,8 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
+#ifndef EXCLUDEADAFRUITGFXLIB
+
 #include <Adafruit_GFX.h>
 #undef min
 #undef max
@@ -8,6 +10,8 @@
 #undef Max
 #undef abs
 #include <Adafruit_ILI9341.h>
+
+#endif
 
 #include "SignalHistory.h"
 #include "user_interface/Displayinterface.h"

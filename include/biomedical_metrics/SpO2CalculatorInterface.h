@@ -13,6 +13,9 @@
 
 template <class element_type>
 class SpO2CalculatorInterface
-    : public CalculationModuleInterface<element_type> {};
+    : public CalculationModuleInterface<element_type> {
+ public:
+  ~SpO2CalculatorInterface(){};
+};
 
 #endif

@@ -1,7 +1,9 @@
 #ifndef HARDWAREABSTRACTIONLAYER_H
 #define HARDWAREABSTRACTIONLAYER_H
 
+#ifndef EXCLUDEARDUINOLIB
 #include <Arduino.h>
+#endif
 #undef Min
 #undef Max
 #undef abs

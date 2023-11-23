@@ -31,6 +31,11 @@ class SpO2Calculator : public SpO2CalculatorInterface<element_type> {
       SignalHistoryInterface<element_type>* infraRedIrSignalPtr,
       element_type samplingPeriodUs) override;
 
+  /**
+   * @brief Class instance destructor.
+   */
+  ~SpO2Calculator();
+
  private:
   /**
    * @brief Calculates the R value from the signal history.

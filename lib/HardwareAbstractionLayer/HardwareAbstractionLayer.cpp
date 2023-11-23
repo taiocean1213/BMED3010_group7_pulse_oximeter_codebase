@@ -1,7 +1,9 @@
 
 #include "HardwareAbstractionLayer.h"
 
+#ifndef EXCLUDEARDUINOLIB
 #include <Arduino.h>
+#endif
 #undef Min
 #undef Max
 #undef abs
@@ -105,7 +107,7 @@ void HardwareAbstractionLayer<voltage_data_type, time_data_type,
    * greater than or equal to timeUs. This effectively makes the function wait
    * until the specified time has passed.
    */
-  while ((micros() - startTime) < timeUs) {
+  while ((micros() - static_cast<unsigned long>(startTime)) < timeUs) {
     // Do nothing, just wait.
   }
 };

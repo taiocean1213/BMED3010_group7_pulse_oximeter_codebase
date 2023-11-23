@@ -13,6 +13,9 @@
 
 template <class element_type>
 class HeartRateCalculatorInterface
-    : public CalculationModuleInterface<element_type> {};
+    : public CalculationModuleInterface<element_type> {
+ public:
+  ~HeartRateCalculatorInterface(){};
+};
 
 #endif

@@ -1,6 +1,8 @@
 #include "PPGSignalHardwareController.h"
 
+#ifndef EXCLUDEARDUINOLIB
 #include <Arduino.h>
+#endif
 #undef Min
 #undef Max
 #undef abs

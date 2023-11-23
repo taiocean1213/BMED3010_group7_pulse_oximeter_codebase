@@ -5,6 +5,10 @@
 #include <algorithm>
 #include <vector>
 
+#ifdef UNIT_TEST
+#include <stdexcept>  // std::invalid_argument
+#endif
+
 /**
  * @brief Constructs a new SignalHistory object.
  *
@@ -59,14 +63,15 @@ void SignalHistory<element_type>::put(element_type signal) {
  */
 template <class element_type>
 element_type SignalHistory<element_type>::get(element_type nthSample) {
+#ifdef UNIT_TEST
   // Check if nthSample is a valid index
-  if (nthSample < history.size()) {
-    // Return the signal at the given index
-    return history.at(nthSample);
-  } else {
-    // Throw an exception if nthSample is not a valid index
-    // e.g. `throw std::out_of_range("Index out of range");`
+  if (nthSample >= history.size()) {
+    throw std::invalid_argument(
+        "Input and output vectors must be of the same size");
   }
+#endif
+
+  return history.at(nthSample);
 };
 
 /**
@@ -77,9 +82,12 @@ element_type SignalHistory<element_type>::get(element_type nthSample) {
  */
 template <class element_type>
 element_type SignalHistory<element_type>::min() {
+#ifdef UNIT_TEST
+  // Check if history is empty
   if (history.empty()) {
-    //`throw std::runtime_error("History is empty");`
+    throw std::runtime_error("History is empty");
   }
+#endif
   // Return the smallest signal in the history
   return *std::min_element(history.begin(), history.end());
 };
@@ -92,9 +100,12 @@ element_type SignalHistory<element_type>::min() {
  */
 template <class element_type>
 element_type SignalHistory<element_type>::max() {
+#ifdef UNIT_TEST
+  // Check if history is empty
   if (history.empty()) {
-    //`throw std::runtime_error("History is empty");`
+    throw std::runtime_error("History is empty");
   }
+#endif
   // Return the largest signal in the history
   return *std::max_element(history.begin(), history.end());
 };

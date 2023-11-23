@@ -28,6 +28,11 @@ class HeartRateCalculator : public HeartRateCalculatorInterface<element_type> {
       SignalHistoryInterface<element_type>* infraRedSignalHistoryPtr,
       element_type samplingPeriodUs) override;
 
+  /**
+   * @brief Class instance destructor.
+   */
+  ~HeartRateCalculator();
+
  private:
   /**
    * @brief Gets the maximum value in the signal history.

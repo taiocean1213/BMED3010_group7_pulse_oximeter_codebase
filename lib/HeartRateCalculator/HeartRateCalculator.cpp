@@ -3,6 +3,12 @@
 #include "SignalHistory.h"
 
 /**
+ * @brief Class instance destructor.
+ */
+template <class element_type>
+HeartRateCalculator<element_type>::~HeartRateCalculator() {}
+
+/**
  * @brief Calculates heart rate from red and infrared signal histories.
  * @param redSignalHistoryPtr Pointer to the red signal history.
  * @param infraRedSignalHistoryPtr Pointer to the infrared signal history.
@@ -118,7 +124,7 @@ template <class element_type>
 element_type HeartRateCalculator<element_type>::countRisingEdgesPerMinute(
     SignalHistoryInterface<element_type>* ppgSignalHistoryPtr,
     element_type threshold, element_type samplingPeriodUs) {
-  element_type risingEdgeCount;
+  element_type risingEdgeCount = 0;
 
   for (size_t i = 0; i < ppgSignalHistoryPtr->size() - 1; i++) {
     element_type firstValue = ppgSignalHistoryPtr->get(

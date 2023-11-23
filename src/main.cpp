@@ -1,3 +1,4 @@
+#ifndef EXCLUDEARDUINOLIB
 #include <Arduino.h>
 
 #undef Min
@@ -21,3 +22,5 @@ void loop() {
   // put your main code here, to run repeatedly:
   eventControllerClassObject->loopOnce();
 }
+
+#endif
