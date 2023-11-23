@@ -2,7 +2,7 @@
 #define FAST_FOURIER_TRANSFORM_H
 
 #include <complex>
-#include <vector>
+#include <iterator>
 
 #include "signal_filter/FastFourierTransformInterface.h"
 
@@ -51,11 +51,13 @@ class FastFourierTransform
 
  private:
   /**
-   * @brief A static function to perform FFT on the input data.
+   * @brief FIXME A static function to perform FFT on the input data.
    * @param a The input data vector.
    * @param invert A boolean indicating whether to perform FFT or inverse FFT.
    */
-  static void fft(std::vector<cd>& a, bool invert);
+  void fft(std::vector<std::complex<element_datatype>>& a,
+           std::vector<std::complex<element_datatype>>& b, unsigned int log2n);
+  unsigned int bitReverse(unsigned int num, unsigned int nBits);
 };
 
 // Explicit instantiation

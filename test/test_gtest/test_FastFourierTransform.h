@@ -2,27 +2,43 @@
 
 #include "FastFourierTransform.h"
 
-class FastFourierTransformTest : public ::testing::Test {
- protected:
-  // You can do set-up work for each test here.
-  FastFourierTransformTest() {
-    // Initialize your FastFourierTransform object here
-    transform = new FastFourierTransform<float>();
-  }
+// Test case for fastFourierTransform method
+TEST(FastFourierTransformTestCase1, FastFourierTransform) {
+  // Arrange
+  std::vector<double> realInput = {0.0d, 1.0d, 3.0d, 4.0d,
+                                   4.0d, 3.0d, 1.0d, 0.0d};
+  std::vector<double> imaginaryInput = {0.0d, 1.0d, 3.0d, 4.0d,
+                                        4.0d, 3.0d, 1.0d, 0.0d};
+  std::vector<double> realOutput;
+  std::vector<double> imaginaryOutput;
+  std::vector<double> expectedRealOutput = {
+      16.0d, -4.82842712d, 0.0d, -0.343146d, 0.0d, 0.828427d, 0.0d, -11.6569d};
+  std::vector<double> expectedImaginaryOutput = {
+      16.0d, -11.6569d, 0.0d, 0.828427d, 0.0d, -0.343146d, 0.0d, -4.82843d};
 
-  // You can do clean-up work that doesn't throw exceptions here.
-  ~FastFourierTransformTest() override {
-    // Delete your FastFourierTransform object here
-    delete transform;
-  }
+  // Act
+  FastFourierTransform<double>* transform = new FastFourierTransform<double>();
+  transform->fastFourierTransform(&realInput, &imaginaryInput, &realOutput,
+                                  &imaginaryOutput);
+  delete transform;
 
-  // Objects declared here can be used by all tests in the test suite for
-  // FastFourierTransform. For example: FastFourierTransform<float>* transform;
-  FastFourierTransform<float>* transform;
-};
+  // Assert
+  EXPECT_EQ(realOutput.size(), expectedRealOutput.size());
+  EXPECT_EQ(imaginaryOutput.size(), expectedImaginaryOutput.size());
+  try {
+    for (unsigned int i = 0; i < realOutput.size(); i++) {
+      double abs_error = 0.001;
+      EXPECT_NEAR(realOutput[i], expectedRealOutput[i], abs_error);
+      EXPECT_NEAR(imaginaryOutput[i], expectedImaginaryOutput[i], abs_error);
+    }
+  } catch (...) {
+    EXPECT_EQ(realOutput, expectedRealOutput);
+    EXPECT_EQ(imaginaryOutput, expectedImaginaryOutput);
+  }
+}
 
 // Test case for fastFourierTransform method
-TEST_F(FastFourierTransformTest, FastFourierTransformTestCase) {
+TEST(FastFourierTransformTestCase2, FastFourierTransform) {
   // Arrange
   std::vector<float> realInput = {1.0f, 2.0f, 3.0f, 4.0f};
   std::vector<float> imaginaryInput = {0.0f, 0.0f, 0.0f, 0.0f};
@@ -32,16 +48,21 @@ TEST_F(FastFourierTransformTest, FastFourierTransformTestCase) {
   std::vector<float> expectedImaginaryOutput = {0.0f, 2.0f, 0.0f, -2.0f};
 
   // Act
+  FastFourierTransform<float>* transform = new FastFourierTransform<float>();
   transform->fastFourierTransform(&realInput, &imaginaryInput, &realOutput,
                                   &imaginaryOutput);
+  delete transform;
 
   // Assert
-  // Check if the output is as expected here
-  EXPECT_EQ(realOutput, expectedRealOutput);
-  EXPECT_EQ(imaginaryOutput, expectedImaginaryOutput);
+  EXPECT_EQ(realOutput.size(), expectedRealOutput.size());
+  EXPECT_EQ(imaginaryOutput.size(), expectedImaginaryOutput.size());
+  for (unsigned int i = 0; i < realOutput.size(); i++) {
+    double abs_error = 0.001;
+    EXPECT_NEAR(realOutput[i], expectedRealOutput[i], abs_error);
+    EXPECT_NEAR(imaginaryOutput[i], expectedImaginaryOutput[i], abs_error);
+  }
 }
-
-TEST_F(FastFourierTransformTest, FFTTestCase) {
+TEST(FastFourierTransformTestCase3, FastFourierTransform) {
   // Arrange
   std::vector<float> realInput = {1.0f, 2.0f, 3.0f, 4.0f, 5.0f,
                                   6.0f, 7.0f, 8.0f, 9.0f};
@@ -49,35 +70,33 @@ TEST_F(FastFourierTransformTest, FFTTestCase) {
                                        0.0f, 0.0f, 0.0f, 0.0f};
   std::vector<float> realOutput;
   std::vector<float> imaginaryOutput;
-  std::vector<float> expectedRealOutput = {45.0f, -4.5f, -4.5f, -4.5f, -4.5f,
-                                           -4.5f, -4.5f, -4.5f, -4.5f};
+  std::vector<float> expectedRealOutput = {
+      45.0f, -17.13707118f, 5.0f, -5.6199144f,  5.0f, -4.72323135f,
+      5.0f,  -4.51978306f,  5.0f, -4.51978306f, 5.0f, -4.72323135f,
+      5.0f,  -5.6199144f,   5.0f, -17.13707118f};
   std::vector<float> expectedImaginaryOutput = {
-      0.0f,         12.36364839f, 5.36289117f,  2.59807621f,  0.79347141f,
-      -0.79347141f, -2.59807621f, -5.36289117f, -12.36364839f};
+      0.0f,  -25.13669746f, 9.65685425f,  -7.48302881f,
+      4.0f,  -3.34089319f,  1.65685425f,  -0.99456184f,
+      0.0f,  0.99456184f,   -1.65685425f, 3.34089319f,
+      -4.0f, 7.48302881f,   -9.65685425f, 25.13669746f};
 
   // Act
+  FastFourierTransform<float>* transform = new FastFourierTransform<float>();
   transform->fastFourierTransform(&realInput, &imaginaryInput, &realOutput,
                                   &imaginaryOutput);
+  delete transform;
 
   // Assert
-  EXPECT_EQ(realOutput, expectedRealOutput);
-  EXPECT_EQ(imaginaryOutput, expectedImaginaryOutput);
-}
-
-// Test case for inverseFastFourierTransform method
-TEST_F(FastFourierTransformTest, InverseFastFourierTransformTestCase) {
-  // Arrange
-  std::vector<float> realInput = {1.0f, 2.0f, 3.0f, 4.0f};
-  std::vector<float> imaginaryInput = {0.0f, 0.0f, 0.0f, 0.0f};
-  std::vector<float> realOutput;
-  std::vector<float> imaginaryOutput;
-
-  // Act
-  // transform->inverseFastFourierTransform(&realInput, &imaginaryInput,
-  //                                       &realOutput, &imaginaryOutput);
-
-  // Assert
-  // Check if the output is as expected here
-  // EXPECT_EQ(realOutput, expectedRealOutput);
-  // EXPECT_EQ(imaginaryOutput, expectedImaginaryOutput);
+  EXPECT_EQ(realOutput.size(), expectedRealOutput.size());
+  EXPECT_EQ(imaginaryOutput.size(), expectedImaginaryOutput.size());
+  try {
+    for (unsigned int i = 0; i < realOutput.size(); i++) {
+      double abs_error = 0.001;
+      EXPECT_NEAR(realOutput[i], expectedRealOutput[i], abs_error);
+      EXPECT_NEAR(imaginaryOutput[i], expectedImaginaryOutput[i], abs_error);
+    }
+  } catch (...) {
+    EXPECT_EQ(realOutput, expectedRealOutput);
+    EXPECT_EQ(imaginaryOutput, expectedImaginaryOutput);
+  }
 }

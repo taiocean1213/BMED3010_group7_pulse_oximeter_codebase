@@ -4,55 +4,59 @@
 #include <complex>
 #include <vector>
 
-using cd = std::complex<double>;
-const double PI = std::acos(-1);
-
-/**
- * @brief A static function to perform FFT on the input data.
- * Modified from from
- * https://cp-algorithms.com/algebra/fft.html#improved-implementation-in-place-computation
- *
- * @param a The input data vector.
- * @param invert A boolean indicating whether to perform FFT or inverse FFT.
- */
+// https://www.oreilly.com/library/view/c-cookbook/0596007612/ch11s18.html
 template <typename element_datatype>
-void FastFourierTransform<element_datatype>::fft(std::vector<cd>& a,
-                                                 bool invert) {
-  int n = a.size();
-  for (int i = 1, j = 0; i < n; i++) {
-    int bit = n >> 1;
-    for (; j & bit; bit >>= 1) j ^= bit;
-    j ^= bit;
-    if (i < j) std::swap(a[i], a[j]);
+unsigned int FastFourierTransform<element_datatype>::bitReverse(
+    unsigned int num, unsigned int nBits) {
+  unsigned int reversed = 0;
+  for (unsigned int i = 0; i < nBits; i++) {
+    reversed <<= 1;
+    reversed |= (num & 1);
+    num >>= 1;
   }
-  for (int len = 2; len <= n; len <<= 1) {
-    double ang = 2 * PI / len * (invert ? -1 : 1);
-    cd wlen(cos(ang), sin(ang));
-    for (int i = 0; i < n; i += len) {
-      cd w(1);
-      for (int j = 0; j < len / 2; j++) {
-        cd u = a[i + j], v = a[i + j + len / 2] * w;
-        a[i + j] = u + v;
-        a[i + j + len / 2] = u - v;
-        w *= wlen;
+  return reversed;
+}
+
+template <typename element_datatype>
+void FastFourierTransform<element_datatype>::fft(
+    std::vector<std::complex<element_datatype>>& input,
+    std::vector<std::complex<element_datatype>>& output, unsigned int log2n) {
+  typedef
+      typename std::iterator_traits<std::complex<element_datatype>*>::value_type
+          complex;
+
+  const element_datatype PI = acos(-1);
+  const complex J(0, 1);
+  unsigned int n = 1 << log2n;
+#ifdef UNIT_TEST
+  // if (std::tuple_size(a) != std::tuple_size(b)) {
+  //   throw std::invalid_argument("Input vectors must have the same size");
+  // }
+  // if ((1 << n) < std::tuple_size(a)) {
+  //   throw std::invalid_argument("`2 ^ log2n` is smaller than the array
+  //   size.");
+  // }
+#endif
+  for (int i = 0; i < n; ++i) {
+    output[this->bitReverse(i, log2n)] = input[i];
+  }
+  for (unsigned int s = 1; s <= log2n; ++s) {
+    int m = 1 << s;
+    int m2 = m >> 1;
+    std::complex<element_datatype> w(1.0, 0);
+    std::complex<element_datatype> wm = std::exp(-J * (PI / m2));
+    for (int j = 0; j < m2; ++j) {
+      for (int k = j; k < n; k += m) {
+        std::complex<element_datatype> t = w * output[k + m2];
+        std::complex<element_datatype> u = output[k];
+        output[k] = u + t;
+        output[k + m2] = u - t;
       }
+      w *= wm;
     }
-  }
-  if (invert) {
-    for (cd& x : a) x /= n;
   }
 }
 
-/**
- * @brief Performs the Fast Fourier Transform operation on the input
- * data. Modified from
- * https://cp-algorithms.com/algebra/fft.html#improved-implementation-in-place-computation
- *
- * @param realInput The input data vector for real part.
- * @param imaginaryInput The input data vector for imaginary part.
- * @param realOutput The output data vector for real part.
- * @param imaginaryOutput The output data vector for imaginary part.
- */
 template <typename element_datatype>
 void FastFourierTransform<element_datatype>::fastFourierTransform(
     const std::vector<element_datatype>* realInput,
@@ -65,36 +69,40 @@ void FastFourierTransform<element_datatype>::fastFourierTransform(
   }
 
   if (realInput->size() != imaginaryInput->size()) {
-    throw std::invalid_argument("Input vectors must have the same size");
+    throw std::invalid_argument(
+        "Real and Imaginary input vectors must have the same size");
   }
 #endif
 
-  std::vector<cd> input(realInput->size());
-  for (size_t i = 0; i < realInput->size(); i++) {
-    input[i] = cd((*realInput)[i], (*imaginaryInput)[i]);
+  unsigned int fftPaddedArraySizeLogBase2 =
+      std::ceil(std::log2(realInput->size()));
+  unsigned int fftPaddedArraySize =
+      static_cast<unsigned int>(std::pow(2, fftPaddedArraySizeLogBase2));
+
+  std::vector<std::complex<element_datatype>> input(fftPaddedArraySize);
+  std::vector<std::complex<element_datatype>> output(fftPaddedArraySize);
+  for (unsigned int i = 0; i < realInput->size(); i++) {
+    input[i] =
+        std::complex<element_datatype>((*realInput)[i], (*imaginaryInput)[i]);
+    output[i] = 0;
   }
-  fft(input, false);
+  for (unsigned int i = realInput->size(); i < fftPaddedArraySize; i++) {
+    input[i] = 0;
+    output[i] = 0;
+  }
 
+  // Use the fft method after preprocessing
+  this->fft(input, output, fftPaddedArraySizeLogBase2);
   // Resize realOutput and imaginaryOutput before assigning values
-  realOutput->resize(realInput->size());
-  imaginaryOutput->resize(imaginaryInput->size());
+  realOutput->resize(fftPaddedArraySize);
+  imaginaryOutput->resize(fftPaddedArraySize);
 
-  for (size_t i = 0; i < realInput->size(); i++) {
-    (*realOutput)[i] = input[i].real();       // FIXME seg fault
-    (*imaginaryOutput)[i] = input[i].imag();  // FIXME seg fault
+  for (unsigned int i = 0; i < fftPaddedArraySize; i++) {
+    (*realOutput)[i] = output[i].real();
+    (*imaginaryOutput)[i] = output[i].imag();
   }
 }
 
-/**
- * @brief Performs the Inverse Fast Fourier Transform operation on the input
- * data. Modified from
- * https://cp-algorithms.com/algebra/fft.html#improved-implementation-in-place-computation
- *
- * @param realInput The input data vector for real part.
- * @param imaginaryInput The input data vector for imaginary part.
- * @param realOutput The output data vector for real part.
- * @param imaginaryOutput The output data vector for imaginary part.
- */
 template <typename element_datatype>
 void FastFourierTransform<element_datatype>::inverseFastFourierTransform(
     const std::vector<element_datatype>* realInput,
@@ -107,22 +115,36 @@ void FastFourierTransform<element_datatype>::inverseFastFourierTransform(
   }
 
   if (realInput->size() != imaginaryInput->size()) {
-    throw std::invalid_argument("Input vectors must have the same size");
+    throw std::invalid_argument(
+        "Real and Imaginary input vectors must have the same size");
   }
 #endif
-  std::vector<cd> input(realInput->size());
-  for (size_t i = 0; i < realInput->size(); i++) {
-    input[i] = cd((*realInput)[i], (*imaginaryInput)[i]);
+
+  unsigned int fftPaddedArraySizeLogBase2 =
+      std::ceil(std::log2(realInput->size()));
+  unsigned int fftPaddedArraySize =
+      static_cast<unsigned int>(std::pow(2, fftPaddedArraySizeLogBase2));
+
+  std::vector<std::complex<element_datatype>> input(fftPaddedArraySize);
+  std::vector<std::complex<element_datatype>> output(fftPaddedArraySize);
+  for (unsigned int i = 0; i < realInput->size(); i++) {
+    input[i] =
+        std::complex<element_datatype>((*realInput)[i], (*imaginaryInput)[i]);
+    output[i] = 0;
   }
-  fft(input, true);
+  for (unsigned int i = realInput->size(); i < fftPaddedArraySize; i++) {
+    input[i] = 0;
+    output[i] = 0;
+  }
 
+  // Use the fft method after preprocessing
+  this->fft(input, output, fftPaddedArraySizeLogBase2);
   // Resize realOutput and imaginaryOutput before assigning values
-  realOutput->resize(realInput->size());
-  imaginaryOutput->resize(imaginaryInput->size());
+  realOutput->resize(fftPaddedArraySize);
+  imaginaryOutput->resize(fftPaddedArraySize);
 
-  for (size_t i = 0; i < realInput->size(); i++) {
-    (*realOutput)[i] = input[i].real() / realInput->size();  // FIXME seg fault
-    (*imaginaryOutput)[i] =
-        input[i].imag() / realInput->size();  // FIXME seg fault
+  for (unsigned int i = 0; i < fftPaddedArraySize; i++) {
+    (*realOutput)[i] = output[i].real();
+    (*imaginaryOutput)[i] = output[i].imag();
   }
 }
