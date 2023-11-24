@@ -36,7 +36,7 @@ void EventController<voltage_data_type, time_data_type,
                           .samplingPeriodUs = 1000000 / 40,
                           .signalHistoryElementsCount = 50,
                           .photoDiodeWarmupTimeUs = 200,
-                          .screenRefreshTimeIntervalUs = 1000000 / 30};
+                          .screenRefreshTimeIntervalUs = 1000000 / 2};
   this->deviceStatus = {
       .redLedVoltage = 0, .infraRedLedVoltage = 0, .deviceState = RedLedOn};
   this->helperClassInstance = {.hardwareLayerPtr = nullptr,
@@ -310,7 +310,6 @@ void EventController<voltage_data_type, time_data_type, pin_id_data_type>::
           this->deviceMemory.rawInfraRedPPGSignalHistoryPtr,
           this->deviceMemory.filteredInfraRedPPGSignalHistoryPtr);
       // Calculate the SpO2 value using the filtered PPG signal histories
-      break;  // remove this This signal processling lib is error
       this->deviceMemory.spO2Value =
           this->helperClassInstance.spO2CalculatorPtr->calculate(
               this->deviceMemory.filteredRedPPGSignalHistoryPtr,

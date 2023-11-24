@@ -50,7 +50,8 @@
         "unordered_set": "cpp",
         "set": "cpp",
         "iomanip": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "thread": "cpp"
     },
     "cmake.configureOnOpen": true,
     "C_Cpp.clang_format_fallbackStyle": "Google",
