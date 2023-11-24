@@ -62,7 +62,7 @@ class Display : public DisplayInterface<values_data_type> {
   void clearScreen() override;
 
  private:
-  Adafruit_ILI9341 TFTscreen;
+  Adafruit_ILI9341* TFTscreenPtr;
 };
 
 // TODO explicit instantiation needed

@@ -25,7 +25,9 @@
  * @brief Constructor for the Display class
  */
 template <class values_data_type>
-Display<values_data_type>::Display() : TFTscreen(_cs, _dc, _rst) {}
+Display<values_data_type>::Display() {
+  TFTscreenPtr = new Adafruit_ILI9341(_cs, _dc, _rst);
+}
 
 /**
  * @brief Initialize the display
@@ -35,11 +37,12 @@ void Display<values_data_type>::begin() {
   // Begin the SPI communication
   SPI.begin();
   // Begin the TFT screen
-  TFTscreen.begin();
+  TFTscreenPtr->begin();
   // Set the rotation of the screen to 3
-  TFTscreen.setRotation(3);
+  TFTscreenPtr->setRotation(3);
   // Fill the screen with black color
-  TFTscreen.fillScreen(ILI9341_BLACK);
+  TFTscreenPtr->fillScreen(ILI9341_BLACK);
+  Serial.println("begin()");
 };
 /**
  * @brief Update the SpO2 value on the display
@@ -49,15 +52,16 @@ void Display<values_data_type>::begin() {
 template <class values_data_type>
 void Display<values_data_type>::updateSpO2(values_data_type spo2_value) {
   // Set the cursor position to the top left corner of the screen
-  TFTscreen.setCursor(0, 0);
+  TFTscreenPtr->setCursor(0, 0);
   // Set the text color to white
-  TFTscreen.setTextColor(ILI9341_WHITE);
+  TFTscreenPtr->setTextColor(ILI9341_WHITE);
   // Set the text size to 2
-  TFTscreen.setTextSize(2);
+  TFTscreenPtr->setTextSize(2);
   // Print the string "SpO2: "
-  TFTscreen.print("SpO2: ");
+  TFTscreenPtr->print("SpO2: ");
   // Print the SpO2 value
-  TFTscreen.print(spo2_value);
+  TFTscreenPtr->print(spo2_value);
+  Serial.println("spo2()");
 };
 /**
  * @brief Update the heart beat rate value on the display
@@ -67,17 +71,18 @@ void Display<values_data_type>::updateSpO2(values_data_type spo2_value) {
 template <class values_data_type>
 void Display<values_data_type>::updateHBR(values_data_type hr_value) {
   // Calculate the half of the screen width
-  int half_screen_width = TFTscreen.width() / 2;
+  int half_screen_width = TFTscreenPtr->width() / 2;
   // Set the cursor position to the middle of the screen
-  TFTscreen.setCursor(half_screen_width, 0);
+  TFTscreenPtr->setCursor(half_screen_width, 0);
   // Set the text color to white
-  TFTscreen.setTextColor(ILI9341_WHITE);
+  TFTscreenPtr->setTextColor(ILI9341_WHITE);
   // Set the text size to 2
-  TFTscreen.setTextSize(2);
+  TFTscreenPtr->setTextSize(2);
   // Print the string "HR: "
-  TFTscreen.print("HR: ");
+  TFTscreenPtr->print("HR: ");
   // Print the heart rate value
-  TFTscreen.print(hr_value);
+  TFTscreenPtr->print(hr_value);
+  Serial.println("HR()");
 };
 /**
  * @brief Update the PPG waveform on the display
@@ -94,10 +99,10 @@ void Display<values_data_type>::updatePPGWave(
   const uint16_t BAR_COLOR = ILI9341_WHITE;
 
   // Calculate the width of each bar
-  int bar_width = TFTscreen.width() / ppgWaveformClassPtr->size();
+  int bar_width = TFTscreenPtr->width() / ppgWaveformClassPtr->size();
 
   // Calculate the half of the screen height
-  int half_screen_height = TFTscreen.height() / 2;
+  int half_screen_height = TFTscreenPtr->height() / 2;
 
   // Loop over each PPG value
   for (int i = 0; i < ppgWaveformClassPtr->size(); i++) {
@@ -113,8 +118,10 @@ void Display<values_data_type>::updatePPGWave(
     int bar_y = half_screen_height - bar_height;
 
     // Draw the bar on the screen
-    TFTscreen.fillRect(i * bar_width, bar_y, bar_width, bar_height, BAR_COLOR);
+    TFTscreenPtr->fillRect(i * bar_width, bar_y, bar_width, bar_height,
+                           BAR_COLOR);
   }
+  Serial.println("PPG()");
 };
 /**
  * @brief Clear the display screen
@@ -122,5 +129,5 @@ void Display<values_data_type>::updatePPGWave(
 template <class values_data_type>
 void Display<values_data_type>::clearScreen() {
   // Fill the screen with black color
-  TFTscreen.fillScreen(ILI9341_BLACK);
+  TFTscreenPtr->fillScreen(ILI9341_BLACK);
 }

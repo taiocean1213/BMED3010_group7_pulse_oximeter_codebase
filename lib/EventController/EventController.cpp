@@ -36,7 +36,7 @@ void EventController<voltage_data_type, time_data_type,
                           .samplingPeriodUs = 1000000 / 40,
                           .signalHistoryElementsCount = 50,
                           .photoDiodeWarmupTimeUs = 200,
-                          .screenRefreshTimeIntervalUs = 1000000 / 2};
+                          .screenRefreshTimeIntervalUs = 1000000 / 30};
   this->deviceStatus = {
       .redLedVoltage = 0, .infraRedLedVoltage = 0, .deviceState = RedLedOn};
   this->helperClassInstance = {.hardwareLayerPtr = nullptr,
@@ -69,6 +69,7 @@ void EventController<voltage_data_type, time_data_type,
       this->helperClassInstance.hardwareLayerPtr);
 
   this->helperClassInstance.displayPtr = new Display<voltage_data_type>();
+  this->helperClassInstance.displayPtr->begin();
 
   this->helperClassInstance.fftPtr =
       new FastFourierTransform<voltage_data_type>();
@@ -84,8 +85,6 @@ void EventController<voltage_data_type, time_data_type,
 
   this->helperClassInstance.heartRateCalculatorPtr =
       new HeartRateCalculator<voltage_data_type>();
-
-  this->helperClassInstance.displayPtr->begin();
 
   // Initialize deviceMemory
   this->deviceMemory = {
@@ -288,8 +287,7 @@ void EventController<voltage_data_type, time_data_type, pin_id_data_type>::
       }
       break;
     case UiIsUpdating:
-      // Code to execute when UiIsUpdating.
-      // Update the SpO2 value on the display
+      // Code to execute when UiIsUpdating.Update the SpO2 value on the display
       this->helperClassInstance.displayPtr->updateSpO2(
           this->deviceMemory.spO2Value);
       // Update the heart beat rate value on the display
@@ -301,6 +299,7 @@ void EventController<voltage_data_type, time_data_type, pin_id_data_type>::
       Serial.println("UI is updating");
       break;
     case SignalIsProcessing:
+
       // Code to execute when SignalIsProcessing.
       // Process the raw red PPG signal history using the filter
       this->helperClassInstance.filterPtr->process(
@@ -311,6 +310,7 @@ void EventController<voltage_data_type, time_data_type, pin_id_data_type>::
           this->deviceMemory.rawInfraRedPPGSignalHistoryPtr,
           this->deviceMemory.filteredInfraRedPPGSignalHistoryPtr);
       // Calculate the SpO2 value using the filtered PPG signal histories
+      break;  // remove this This signal processling lib is error
       this->deviceMemory.spO2Value =
           this->helperClassInstance.spO2CalculatorPtr->calculate(
               this->deviceMemory.filteredRedPPGSignalHistoryPtr,
