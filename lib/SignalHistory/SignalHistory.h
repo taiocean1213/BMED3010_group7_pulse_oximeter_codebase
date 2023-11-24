@@ -20,7 +20,7 @@ class SignalHistory : public SignalHistoryInterface<element_type> {
    *
    * This constructor initializes an empty vector with a capacity of ARRAYSIZE.
    */
-  SignalHistory(element_type arraySize);
+  SignalHistory();
 
   /**
    * @brief Destructs a new SignalHistory object.

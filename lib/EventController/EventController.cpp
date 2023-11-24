@@ -97,15 +97,11 @@ void EventController<voltage_data_type, time_data_type,
           this->deviceSettings.screenRefreshTimeIntervalUs,
       .lastDisplayUpdateTime = 0,
       .lastFilteredSignalUpdateTime = 0,
-      .rawRedPPGSignalHistoryPtr = new SignalHistory<voltage_data_type>(
-          this->deviceSettings.signalHistoryElementsCount),
-      .filteredRedPPGSignalHistoryPtr = new SignalHistory<voltage_data_type>(
-          this->deviceSettings.signalHistoryElementsCount),
-      .rawInfraRedPPGSignalHistoryPtr = new SignalHistory<voltage_data_type>(
-          this->deviceSettings.signalHistoryElementsCount),
+      .rawRedPPGSignalHistoryPtr = new SignalHistory<voltage_data_type>(),
+      .filteredRedPPGSignalHistoryPtr = new SignalHistory<voltage_data_type>(),
+      .rawInfraRedPPGSignalHistoryPtr = new SignalHistory<voltage_data_type>(),
       .filteredInfraRedPPGSignalHistoryPtr =
-          new SignalHistory<voltage_data_type>(
-              this->deviceSettings.signalHistoryElementsCount),
+          new SignalHistory<voltage_data_type>(),
       .spO2Value = 0,
       .heartBeatRateValue = 0,
   };

@@ -39,10 +39,11 @@ void Filter<element_data_type, signal_period_datatype>::process(
     SignalHistoryInterface<element_data_type>* filterInputPtr,
     SignalHistoryInterface<element_data_type>* filterOutputPtr) {
   // Retrieve the signal history from the input filter
-  size_t historySize = filterInputPtr->size();
+  element_data_type historySize =
+      static_cast<element_data_type>(filterInputPtr->size());
   std::vector<element_data_type> realInput(historySize),
       imaginaryInput(historySize);
-  for (size_t i = 0; i < historySize; ++i) {
+  for (std::size_t i = 0; i < historySize; ++i) {
     realInput[i] = filterInputPtr->get(i);
     imaginaryInput[i] = 0;  // Assume that the imaginary part is always 0
   }
@@ -53,11 +54,12 @@ void Filter<element_data_type, signal_period_datatype>::process(
                                             &realOutput, &imaginaryOutput);
 
   // Modify the frequency components according to the passbands and stopbands
-  for (size_t i = 0; i < realOutput.size(); ++i) {
+  for (std::size_t i = 0; i < realOutput.size(); ++i) {
     const element_data_type millisecondsInSeconds = 1000000;
 
     // Calculate the frequency in Hz
-    element_data_type frequency = i * samplingPeriodUs;
+    element_data_type frequency =
+        static_cast<element_data_type>(i) * samplingPeriodUs;
     frequency /= millisecondsInSeconds;
 
     // Check if the frequency is in the stopband or not in the passband

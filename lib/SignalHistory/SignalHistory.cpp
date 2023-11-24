@@ -14,13 +14,9 @@
  *
  * This constructor initializes an empty vector with a size of arraySize.
  *
- * @param arraySize The size of the vector.
  */
 template <class element_type>
-SignalHistory<element_type>::SignalHistory(element_type arraySize) {
-  // Initialize the vector with a size of arraySize
-  history.resize(arraySize);
-};
+SignalHistory<element_type>::SignalHistory(){};
 
 /**
  * @brief Destructs a new SignalHistory object.
