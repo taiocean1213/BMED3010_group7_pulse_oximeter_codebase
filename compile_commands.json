@@ -1,0 +1,8 @@
+[
+    {
+        "command": "/usr/bin/g++ -o .pio/build/native/src/main.o -c -std=c++11 -DPLATFORMIO=60111 -DEXCLUDEARDUINOLIB -DEXCLUDEADAFRUITGFXLIB -DUNIT_TEST -Isrc -Iinclude -Ilib -Itest src/main.cpp",
+        "directory": "/home/taiocean1213/Desktop/BMED3010_group7_pulse_oximeter_codebase",
+        "file": "src/main.cpp",
+        "output": ".pio/build/native/src/main.o"
+    }
+]
