@@ -127,9 +127,12 @@ void FastFourierTransform<element_datatype>::inverseFastFourierTransform(
 
   std::vector<std::complex<element_datatype>> input(fftPaddedArraySize);
   std::vector<std::complex<element_datatype>> output(fftPaddedArraySize);
+
+  element_datatype conjugateFactor = -1;
+
   for (unsigned int i = 0; i < realInput->size(); i++) {
-    input[i] =
-        std::complex<element_datatype>((*realInput)[i], (*imaginaryInput)[i]);
+    input[i] = std::complex<element_datatype>(
+        (*realInput)[i], conjugateFactor * (*imaginaryInput)[i]);
     output[i] = 0;
   }
   for (unsigned int i = realInput->size(); i < fftPaddedArraySize; i++) {
@@ -144,7 +147,9 @@ void FastFourierTransform<element_datatype>::inverseFastFourierTransform(
   imaginaryOutput->resize(fftPaddedArraySize);
 
   for (unsigned int i = 0; i < fftPaddedArraySize; i++) {
-    (*realOutput)[i] = output[i].real();
-    (*imaginaryOutput)[i] = output[i].imag();
+    (*realOutput)[i] =
+        output[i].real() / static_cast<element_datatype>(fftPaddedArraySize);
+    (*imaginaryOutput)[i] = conjugateFactor * output[i].imag() /
+                            static_cast<element_datatype>(fftPaddedArraySize);
   }
 }
