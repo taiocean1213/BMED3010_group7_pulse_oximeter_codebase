@@ -1,61 +1,49 @@
 #include <gtest/gtest.h>
 
+#include "FastFourierTransform.h"
 #include "Filter.h"
+#include "SignalHistory.h"
 
 class FilterTest : public ::testing::Test {
  protected:
-  // You can do set-up work for each test here.
-  FilterTest() {
-    // Initialize the Filter object here.
-    // For example:
-    // filter = new Filter<double, int>(passbands, stopbands, samplingPeriodUs,
-    // fftClassInstance);
+  void SetUp() override {
+    // Initialize the filter with test data
+    filter = new Filter<double, double>(passbands, stopbands, samplingPeriodUs,
+                                        &fft);
   }
 
-  // You can do clean-up work that doesn't throw exceptions here.
-  ~FilterTest() override {
-    // Clean up the Filter object here.
-    // For example:
-    // delete filter;
+  void TearDown() override {
+    // Clean up the filter after each test
+    delete filter;
   }
 
-  // Objects declared here can be used by all tests in the test suite for
-  // Filter. For example: Filter<double, int>* filter;
+  Filter<double, double>* filter;
+  std::vector<std::pair<double, double>> passbands = {{0, 1}, {2, 3}};
+  std::vector<std::pair<double, double>> stopbands = {{1.5, 2.5}};
+  double samplingPeriodUs = 0.01;
+  FastFourierTransform<double> fft;
 };
 
-// Test case for Filter constructor
-TEST_F(FilterTest, FilterConstructor) {
-  // Arrange
-  std::vector<std::pair<double, double>> passbands = {{1.0, 2.0}, {3.0, 4.0}};
-  std::vector<std::pair<double, double>> stopbands = {{5.0, 6.0}, {7.0, 8.0}};
-  double samplingPeriodUs = 1000.0;
-  FastFourierTransformInterface<double>* fftClassInstance =
-      nullptr;  // Replace with a valid instance
+TEST_F(FilterTest, ProcessTest) {
+  // Create a test input signal
+  SignalHistory<double>* input = new SignalHistory<double>();
+  for (int i = 0; i < 10; ++i) {
+    input->put(i);
+  }
 
-  // Act
-  Filter<double, int> filter(passbands, stopbands, samplingPeriodUs,
-                             fftClassInstance);
+  // Create a test output signal
+  SignalHistory<double>* output = new SignalHistory<double>();
 
-  // Assert
-  // Check if the filter object was initialized correctly
-  // For example:
-  // EXPECT_EQ(filter.getSamplingPeriodUs(), samplingPeriodUs);
-}
+  // Apply the filter to the input signal
+  filter->process(input, output);
 
-// Test case for Filter process method
-TEST_F(FilterTest, FilterProcess) {
-  // Arrange
-  // Replace with valid instances of SignalHistoryInterface
-  SignalHistoryInterface<double>* filterInputPtr = nullptr;
-  SignalHistoryInterface<double>* filterOutputPtr = nullptr;
+  // Check the output signal
+  ASSERT_EQ(output->size(), 10);
+  for (int i = 0; i < 10; ++i) {
+    EXPECT_EQ(output->get(i), i);
+  }
 
-  // Act
-  // Replace with a valid Filter object
-  Filter<double, int>* filter = nullptr;
-  filter->process(filterInputPtr, filterOutputPtr);
-
-  // Assert
-  // Check if the process method works correctly
-  // For example:
-  // EXPECT_EQ(filterOutputPtr->size(), filterInputPtr->size());
+  // Clean up the test signals
+  delete input;
+  delete output;
 }

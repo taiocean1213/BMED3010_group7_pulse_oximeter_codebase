@@ -1,5 +1,8 @@
 #include "Filter.h"
 
+#ifdef UNIT_TEST
+#include <stdexcept>
+#endif
 /**
  * @brief Constructor of the Filter class.
  *
@@ -17,6 +20,12 @@ Filter<element_data_type, signal_period_datatype>::Filter(
     std::vector<std::pair<element_data_type, element_data_type>>& stopbands,
     element_data_type samplingPeriodUs,
     FastFourierTransformInterface<element_data_type>* fftClassInstanceParam) {
+#ifdef UNIT_TEST
+  if (fftClassInstanceParam == nullptr) {
+    throw std::invalid_argument("fftClassInstanceParam cannot be null");
+  }
+#endif
+
   // Set the FFT instance
   this->fftClassInstancePtr = fftClassInstanceParam;
   // Set the sampling period
@@ -38,6 +47,13 @@ template <typename element_data_type, typename signal_period_datatype>
 void Filter<element_data_type, signal_period_datatype>::process(
     SignalHistoryInterface<element_data_type>* filterInputPtr,
     SignalHistoryInterface<element_data_type>* filterOutputPtr) {
+#ifdef UNIT_TEST
+  if (filterInputPtr == nullptr || filterOutputPtr == nullptr) {
+    throw std::invalid_argument(
+        "filterInputPtr and filterOutputPtr cannot be null");
+  }
+#endif
+
   // Retrieve the signal history from the input filter
   element_data_type historySize =
       static_cast<element_data_type>(filterInputPtr->size());

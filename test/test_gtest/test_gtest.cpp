@@ -1,9 +1,10 @@
 #include <gtest/gtest.h>
 
 #include "test_gtest/test_FastFourierTransform.h"
-// #include "test_gtest/test_Filter.h"
+#include "test_gtest/test_Filter.h"
 #include "test_gtest/test_HeartRateCalculator.h"
 #include "test_gtest/test_SignalHistory.h"
+#include "test_gtest/test_SpO2Calculator.h"
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);

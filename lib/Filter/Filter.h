@@ -66,5 +66,6 @@ class Filter
 };
 
 template class Filter<double, int>;
+template class Filter<double, double>;
 
 #endif
