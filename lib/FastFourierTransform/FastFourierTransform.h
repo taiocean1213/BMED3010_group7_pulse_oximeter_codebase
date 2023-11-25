@@ -20,7 +20,8 @@ class FastFourierTransform
     : public FastFourierTransformInterface<element_datatype> {
  public:
   /**
-   * @brief Performs the Fast Fourier Transform operation on the input data.
+   * @brief Performs the Fast Fourier Transform operation on the input data and
+   * returns the result to the address with `2 ^ realInput.length()` elements.
    * @param realInput The input data vector for real part.
    * @param imaginaryInput The input data vector for imaginary part.
    * @param realOutput The output data vector for real part.
@@ -35,7 +36,8 @@ class FastFourierTransform
 
   /**
    * @brief Performs the Inverse Fast Fourier Transform operation on the input
-   * data.
+   * data and returns the result to the address with `2 ^ realInput.length()`
+   * elements.
    * @param realInput The input data vector for real part.
    * @param imaginaryInput The input data vector for imaginary part.
    * @param realOutput The output data vector for real part.

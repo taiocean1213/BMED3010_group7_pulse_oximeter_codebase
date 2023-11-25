@@ -75,7 +75,8 @@ void Filter<element_data_type, signal_period_datatype>::process(
 
     // Calculate the frequency in Hz
     element_data_type frequency =
-        static_cast<element_data_type>(i) * samplingPeriodUs;
+        static_cast<element_data_type>(static_cast<double>(i)) *
+        samplingPeriodUs;
     frequency /= millisecondsInSeconds;
 
     // Check if the frequency is in the stopband or not in the passband
@@ -85,8 +86,10 @@ void Filter<element_data_type, signal_period_datatype>::process(
     } else if (isInPassband(frequency, passbands)) {
       // Do nothing
     } else {
-      realOutput[i] = 0;
-      imaginaryOutput[i] = 0;
+#ifdef UNIT_TEST
+      throw std::invalid_argument(
+          "Frequency not placed in passband or stopband");
+#endif
     }
   }
 

@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include "HeartRateCalculator.h"
 #include "SignalHistory.h"
 #include "gtest/gtest.h"
@@ -13,8 +15,8 @@ TEST(HeartRateCalculatorTest1, CalculateTest) {
 
   for (int i = 0; i < (int)expectedHeartRate; ++i) {
     double time = i / 60.0;
-    redSignalHistory->put(sin(2 * M_PI * 1 * time));
-    infraRedSignalHistory->put(sin(2 * M_PI * 1 * time));
+    redSignalHistory->put(std::sin(2 * M_PI * 1 * time));
+    infraRedSignalHistory->put(std::sin(2 * M_PI * 1 * time));
   }
 
   // Act
@@ -43,8 +45,8 @@ TEST(HeartRateCalculatorTest2, CalculateTest) {
 
   for (int i = 0; i < (int)expectedHeartRate; ++i) {
     double time = i / 60.0;
-    redSignalHistory->put(sin(2 * M_PI * 1 * time));
-    infraRedSignalHistory->put(sin(2 * M_PI * 1 * time));
+    redSignalHistory->put(std::sin(2 * M_PI * 1 * time));
+    infraRedSignalHistory->put(std::sin(2 * M_PI * 1 * time));
   }
 
   // Act
@@ -74,8 +76,8 @@ TEST(HeartRateCalculatorTest3, CalculateTest) {
 
   for (int i = 0; i < (int)expectedHeartRate; ++i) {
     double time = i / 60.0;
-    redSignalHistory->put(sin(2 * M_PI * 1 * time));
-    infraRedSignalHistory->put(sin(2 * M_PI * 1 * time));
+    redSignalHistory->put(std::sin(2 * M_PI * 1 * time));
+    infraRedSignalHistory->put(std::sin(2 * M_PI * 1 * time));
   }
 
   // Act
@@ -105,8 +107,8 @@ TEST(HeartRateCalculatorTest4, CalculateTest) {
 
   for (int i = 0; i < (int)expectedHeartRate; ++i) {
     double time = i / 60.0;
-    redSignalHistory->put(sin(2 * M_PI * 1 * time));
-    infraRedSignalHistory->put(sin(2 * M_PI * 1 * time));
+    redSignalHistory->put(std::sin(2 * M_PI * 1 * time));
+    infraRedSignalHistory->put(std::sin(2 * M_PI * 1 * time));
   }
 
   // Act
@@ -136,8 +138,8 @@ TEST(HeartRateCalculatorTest5, CalculateTest) {
 
   for (int i = 0; i < (int)expectedHeartRate; ++i) {
     double time = i / 60.0;
-    redSignalHistory->put(sin(2 * M_PI * 1 * time));
-    infraRedSignalHistory->put(sin(2 * M_PI * 1 * time));
+    redSignalHistory->put(std::sin(2 * M_PI * 1 * time));
+    infraRedSignalHistory->put(std::sin(2 * M_PI * 1 * time));
   }
 
   // Act
@@ -167,8 +169,8 @@ TEST(HeartRateCalculatorTest6, CalculateTest) {
 
   for (int i = 0; i < (int)expectedHeartRate; ++i) {
     double time = i / 60.0;
-    redSignalHistory->put(sin(2 * M_PI * 1 * time));
-    infraRedSignalHistory->put(sin(2 * M_PI * 1 * time));
+    redSignalHistory->put(std::sin(2 * M_PI * 1 * time));
+    infraRedSignalHistory->put(std::sin(2 * M_PI * 1 * time));
   }
 
   // Act
@@ -198,8 +200,8 @@ TEST(HeartRateCalculatorTest7, CalculateTest) {
 
   for (int i = 0; i < (int)expectedHeartRate; ++i) {
     double time = i / 60.0;
-    redSignalHistory->put(sin(2 * M_PI * 1 * time));
-    infraRedSignalHistory->put(sin(2 * M_PI * 1 * time));
+    redSignalHistory->put(std::sin(2 * M_PI * 1 * time));
+    infraRedSignalHistory->put(std::sin(2 * M_PI * 1 * time));
   }
 
   // Act
