@@ -35,6 +35,31 @@ Filter<element_data_type, signal_period_datatype>::Filter(
   this->passbands.assign(passbands.begin(), passbands.end());
   this->stopbands.assign(stopbands.begin(), stopbands.end());
 }
+/**
+ * @brief Generate a vector of frequencies for a signal of size n.
+ *
+ * This function generates a vector of frequencies for a signal of size n. The
+ * frequencies are calculated following the convention of np.fft.fftfreq in
+ * Python's NumPy library. The first half of the frequencies are positive and
+ * the second half are negative.
+ *
+ * @tparam element_data_type The type of the numbers in the vector.
+ * @param n The size of the signal.
+ * @return A vector of frequencies.
+ */
+template <typename element_data_type, typename signal_period_datatype>
+std::vector<element_data_type>
+Filter<element_data_type, signal_period_datatype>::fftfreq(unsigned int n) {
+  std::vector<element_data_type> freq(n);
+  unsigned int d = 1.0 / n;
+  for (unsigned int i = 0; i < n / 2; ++i) {
+    freq[i] = i * d;
+  }
+  for (unsigned int i = n / 2; i < n; ++i) {
+    freq[i] = (i - n) * d;
+  }
+  return freq;
+}
 
 /**
  * @brief Apply the filter to the given data based on the configuration set by
@@ -69,30 +94,36 @@ void Filter<element_data_type, signal_period_datatype>::process(
   fftClassInstancePtr->fastFourierTransform(&realInput, &imaginaryInput,
                                             &realOutput, &imaginaryOutput);
 
+  // Array size check.
+#ifdef UNIT_TEST
+  if (realOutput.size() == imaginaryOutput.size()) {
+    throw std::invalid_argument(
+        "realOutput and imaginaryOutput have different size.");
+  }
+#endif
+
+  //  Get the frequencies in the frequency
+  std::vector<element_data_type> fftFrequency =
+      this->fftfreq(static_cast<unsigned int>(realOutput.size()));
+
   // Modify the frequency components according to the passbands and stopbands
   for (std::size_t i = 0; i < realOutput.size(); ++i) {
-    const element_data_type millisecondsInSeconds = 1000000;
+    element_data_type fftFrequencyIter = fftFrequency[i];
 
-    // Calculate the frequency in Hz
-    element_data_type frequency =
-        static_cast<element_data_type>(static_cast<double>(i)) *
-        samplingPeriodUs;
-    frequency /= millisecondsInSeconds;
+    if (isInPassband(fftFrequencyIter, stopbands)) continue;
 
-    // Check if the frequency is in the stopband or not in the passband
-    if (isInStopband(frequency, stopbands)) {
-      realOutput[i] = 0;
-      imaginaryOutput[i] = 0;
-    } else if (isInPassband(frequency, passbands)) {
-      // Do nothing
-    } else {
+    realOutput[i] = 0;
+    imaginaryOutput[i] = 0;
+
 #ifdef UNIT_TEST
+    if (!isInStopband(fftFrequencyIter, stopbands)) {
       throw std::invalid_argument(
           "Frequency not placed in passband or stopband");
-#endif
     }
+#endif
   }
 
+  return;
   // Perform inverse FFT on the modified frequency components
   std::vector<element_data_type> realOutputInverse, imaginaryOutputInverse;
   fftClassInstancePtr->inverseFastFourierTransform(
@@ -100,8 +131,8 @@ void Filter<element_data_type, signal_period_datatype>::process(
       &imaginaryOutputInverse);
 
   // Store the filtered signal
-  for (const auto& sample : realOutputInverse) {
-    filterOutputPtr->put(sample);
+  for (std::size_t i = 0; i < realInput.size(); ++i) {
+    filterOutputPtr->put(realOutputInverse[i]);
   }
 
   // Free all the memory
@@ -111,6 +142,7 @@ void Filter<element_data_type, signal_period_datatype>::process(
   imaginaryOutput.clear();
   realOutputInverse.clear();
   imaginaryOutputInverse.clear();
+  fftFrequency.clear();
 
   realInput.shrink_to_fit();
   imaginaryInput.shrink_to_fit();
@@ -118,6 +150,7 @@ void Filter<element_data_type, signal_period_datatype>::process(
   imaginaryOutput.shrink_to_fit();
   realOutputInverse.shrink_to_fit();
   imaginaryOutputInverse.shrink_to_fit();
+  fftFrequency.shrink_to_fit();
 
   return;
 }

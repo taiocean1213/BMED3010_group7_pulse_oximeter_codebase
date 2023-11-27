@@ -63,6 +63,20 @@ class Filter
       element_data_type frequency,
       const std::vector<std::pair<element_data_type, element_data_type>>&
           stopbands);
+
+  /**
+   * @brief Generate a vector of frequencies for a signal of size n.
+   *
+   * This function generates a vector of frequencies for a signal of size n. The
+   * frequencies are calculated following the convention of np.fft.fftfreq in
+   * Python's NumPy library. The first half of the frequencies are positive and
+   * the second half are negative.
+   *
+   * @tparam element_data_type The type of the numbers in the vector.
+   * @param n The size of the signal.
+   * @return A vector of frequencies.
+   */
+  std::vector<element_data_type> fftfreq(unsigned int n);
 };
 
 template class Filter<double, int>;

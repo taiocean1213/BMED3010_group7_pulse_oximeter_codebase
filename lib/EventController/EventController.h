@@ -137,7 +137,7 @@ class EventController : public EventControllerInterface {
     voltage_data_type redLedVoltage;
     voltage_data_type infraRedLedVoltage;
     DeviceState deviceState;
-    int statesCompleted[DeviceStateTotal];
+    long long int statesCompleted[DeviceStateTotal];
   } device_status_data_type;
 
   /**

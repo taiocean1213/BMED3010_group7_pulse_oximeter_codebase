@@ -1,5 +1,10 @@
 #include "SpO2Calculator.h"
 
+#ifdef UNIT_TEST
+#include <stdexcept>
+
+#endif
+
 #include <cmath>    // for std::sqrt
 #include <numeric>  // for std::accumulate
 
@@ -44,12 +49,28 @@ template <class element_type>
 element_type SpO2Calculator<element_type>::calculateRValue(
     SignalHistoryInterface<element_type>* redInfraredSignalPtr,
     SignalHistoryInterface<element_type>* infraredSignalPtr) {
+#ifdef UNIT_TEST
+
+  // Check if the pointers are not null
+  if (!redInfraredSignalPtr || !infraredSignalPtr) {
+    throw std::invalid_argument("Pointers cannot be null");
+  }
+#endif
+
   // Define the literal
   const element_type DEFAULTINITIALVALUE = 0;
 
   // declare the variables
   element_type sumOfRedSignals = DEFAULTINITIALVALUE;
   element_type sumOfInfraRedSignals = DEFAULTINITIALVALUE;
+
+#ifdef UNIT_TEST
+  // Check if the size of the objects is not zero before accessing their
+  // elements
+  if (redInfraredSignalPtr->size() == 0 || infraredSignalPtr->size() == 0) {
+    throw std::invalid_argument("Size of the objects cannot be zero");
+  }
+#endif
 
   // Populate the redData and infraredData vectors with data from the signal
   // history objects
