@@ -18,8 +18,8 @@ Thanks for your interest in improving Open Pulse Oximeter.
 
 ### Install
 ```bash
-git clone https://github.com/taiocean1213/BMED3010_group7_pulse_oximeter_codebase.git
-cd BMED3010_group7_pulse_oximeter_codebase
+git clone https://github.com/taiocean1213/open-pulse-oximeter.git
+cd open-pulse-oximeter
 ```
 
 ### Run tests

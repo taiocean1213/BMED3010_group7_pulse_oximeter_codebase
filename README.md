@@ -1,6 +1,6 @@
 # Open Pulse Oximeter
 
-[![CI](https://github.com/taiocean1213/BMED3010_group7_pulse_oximeter_codebase/actions/workflows/ci.yml/badge.svg)](https://github.com/taiocean1213/BMED3010_group7_pulse_oximeter_codebase/actions/workflows/ci.yml)
+[![CI](https://github.com/taiocean1213/open-pulse-oximeter/actions/workflows/ci.yml/badge.svg)](https://github.com/taiocean1213/open-pulse-oximeter/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![GitHub Sponsors](https://img.shields.io/badge/Sponsor-GitHub%20Sponsors-ea4aaa)](https://github.com/sponsors/taiocean1213)
@@ -88,8 +88,8 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed documentation.
 ### Clone and Build
 
 ```bash
-git clone https://github.com/taiocean1213/BMED3010_group7_pulse_oximeter_codebase.git
-cd BMED3010_group7_pulse_oximeter_codebase
+git clone https://github.com/taiocean1213/open-pulse-oximeter.git
+cd open-pulse-oximeter
 ```
 
 #### Build for Arduino Due (requires hardware)
@@ -164,7 +164,7 @@ Please read our [Contributing Guide](CONTRIBUTING.md) to get started.
 
 ### Good First Issues
 
-Look for issues labeled [`good first issue`](https://github.com/taiocean1213/BMED3010_group7_pulse_oximeter_codebase/labels/good%20first%20issue) to find beginner-friendly tasks.
+Look for issues labeled [`good first issue`](https://github.com/taiocean1213/open-pulse-oximeter/labels/good%20first%20issue) to find beginner-friendly tasks.
 
 ### Areas Where We Need Help
 
